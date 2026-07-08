@@ -3,7 +3,7 @@ import type { PropType } from "vue";
 import { screen, fireEvent, waitFor, cleanup } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
-import type { AssistantMessage, Message } from "@ag-ui/core";
+import type { Message } from "@ag-ui/core";
 import { ToolCallStatus } from "@copilotkit/core";
 import CopilotChat from "../../components/chat/CopilotChat.vue";
 import CopilotChatToolCallsView from "../../components/chat/CopilotChatToolCallsView.vue";
@@ -11,6 +11,7 @@ import { useHumanInTheLoop } from "../use-human-in-the-loop";
 import {
   MockStepwiseAgent,
   MockReconnectableAgent,
+  assistantMessageWithToolCall,
   renderWithCopilotKit,
   runStartedEvent,
   runFinishedEvent,
@@ -780,21 +781,12 @@ describe("useHumanInTheLoop E2E - HITL Tool Rendering", () => {
           useHumanInTheLoop(hitlTool, [version]);
 
           const toolCallId = testId("hitl_dep_tc");
-          const assistantMessage: AssistantMessage = {
+          const assistantMessage = assistantMessageWithToolCall({
             id: testId("hitl_dep_a"),
-            role: "assistant",
-            content: "",
-            toolCalls: [
-              {
-                id: toolCallId,
-                type: "function",
-                function: {
-                  name: "dependencyHitlTool",
-                  arguments: JSON.stringify({ message: "hello" }),
-                },
-              } as any,
-            ],
-          } as any;
+            toolCallId,
+            toolName: "dependencyHitlTool",
+            toolArguments: { message: "hello" },
+          });
           const messages: Message[] = [];
 
           const bumpVersion = () => {

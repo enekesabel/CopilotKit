@@ -463,6 +463,8 @@ watch(
       onError: (event: {
         error: Error;
         code: CopilotKitCoreErrorCode;
+        // Opaque error context payload; matches React API (enekesabel/CopilotKit#4).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         context: Record<string, any>;
       }) => {
         void props.onError?.({

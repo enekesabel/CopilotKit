@@ -70,6 +70,7 @@ defineSlots<{
   "suggestion-view"?: (props: CopilotChatSuggestionViewSlotProps) => unknown;
   "welcome-screen"?: (props: CopilotChatWelcomeScreenSlotProps) => unknown;
   "welcome-message"?: () => unknown;
+  // Catch-all supports dynamic slot forwarding until typed slot families land (enekesabel/CopilotKit#4).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: ((props: any) => unknown) | undefined;
 }>();

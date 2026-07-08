@@ -9,6 +9,7 @@ import type {
 } from "@ag-ui/client";
 import type { Suggestion } from "@copilotkit/core";
 import { randomUUID } from "@copilotkit/shared";
+import type { Observable } from "rxjs";
 
 export function toolCallMessage(
   toolCallName: string,
@@ -41,7 +42,7 @@ export class StateCapturingAgent extends AbstractAgent {
     this.outcomes = [...outcomes];
   }
 
-  run(): any {
+  run(_input: RunAgentInput): Observable<BaseEvent> {
     throw new Error("StateCapturingAgent.run() should not be used in tests");
   }
 
@@ -124,7 +125,7 @@ export class SuggestionsProviderAgent extends AbstractAgent {
     this.responses = responses;
   }
 
-  run(): any {
+  run(_input: RunAgentInput): Observable<BaseEvent> {
     throw new Error(
       "SuggestionsProviderAgent.run() should not be used in tests",
     );
@@ -208,7 +209,7 @@ export class SequencedRunAgent extends AbstractAgent {
     this.handlers = [...handlers];
   }
 
-  run(): any {
+  run(_input: RunAgentInput): Observable<BaseEvent> {
     throw new Error("SequencedRunAgent.run() should not be used in tests");
   }
 
@@ -309,7 +310,7 @@ export class MockStepwiseAgent extends AbstractAgent {
     return cloned;
   }
 
-  override run(_input: RunAgentInput): any {
+  override run(_input: RunAgentInput): Observable<BaseEvent> {
     return {
       subscribe: (observer: {
         next?: (event: BaseEvent) => void;

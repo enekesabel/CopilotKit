@@ -42,7 +42,7 @@ vi.mock("../../providers/useCopilotKit", () => ({
 
 const mockUseCopilotKit = useCopilotKit as ReturnType<typeof vi.fn>;
 const threadMocks = vi.hoisted(() => ({
-  sockets: [] as any[],
+  sockets: [] as unknown[],
   dispatchedContexts: [] as Array<ThreadState["context"]>,
 }));
 

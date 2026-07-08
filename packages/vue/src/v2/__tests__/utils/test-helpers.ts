@@ -2,12 +2,41 @@ import { render } from "@testing-library/vue";
 import { DEFAULT_AGENT_ID } from "@copilotkit/shared";
 import { AbstractAgent, EventType } from "@ag-ui/client";
 import type { BaseEvent, RunAgentInput } from "@ag-ui/client";
+import type { AssistantMessage } from "@ag-ui/core";
 import { Observable, Subject, from, delay } from "rxjs";
 import { defineComponent, nextTick } from "vue";
 import type { Component } from "vue";
 import CopilotKitProvider from "../../providers/CopilotKitProvider.vue";
 import CopilotChatConfigurationProvider from "../../providers/CopilotChatConfigurationProvider.vue";
 import CopilotChat from "../../components/chat/CopilotChat.vue";
+
+/** Capture clone source without assigning `this` to a local (no-this-alias). */
+export function cloneBacking<T>(agent: T): T {
+  return agent;
+}
+
+export function assistantMessageWithToolCall(args: {
+  id: string;
+  toolCallId: string;
+  toolName: string;
+  toolArguments?: Record<string, unknown>;
+}): AssistantMessage {
+  return {
+    id: args.id,
+    role: "assistant",
+    content: "",
+    toolCalls: [
+      {
+        id: args.toolCallId,
+        type: "function",
+        function: {
+          name: args.toolName,
+          arguments: JSON.stringify(args.toolArguments ?? {}),
+        },
+      },
+    ],
+  };
+}
 
 export class MockStepwiseAgent extends AbstractAgent {
   private readonly subject = new Subject<BaseEvent>();
@@ -59,7 +88,7 @@ export class MockStepwiseAgent extends AbstractAgent {
   clone(): MockStepwiseAgent {
     const cloned = new (this.constructor as new () => MockStepwiseAgent)();
     cloned.agentId = this.agentId;
-    const registry = this;
+    const source = cloneBacking(this);
     (
       cloned as unknown as {
         subject: Subject<BaseEvent>;
@@ -96,37 +125,37 @@ export class MockStepwiseAgent extends AbstractAgent {
     Object.defineProperties(cloned, {
       threadId: {
         get() {
-          return registry.threadId;
+          return source.threadId;
         },
         set(v: string) {
-          registry.threadId = v;
+          source.threadId = v;
         },
         configurable: true,
       },
       messages: {
         get() {
-          return registry.messages;
+          return source.messages;
         },
         set(v: BaseEvent[]) {
-          (registry as unknown as { messages: BaseEvent[] }).messages = v;
+          (source as unknown as { messages: BaseEvent[] }).messages = v;
         },
         configurable: true,
       },
       state: {
         get() {
-          return registry.state;
+          return source.state;
         },
         set(v: Record<string, unknown>) {
-          registry.state = v;
+          source.state = v;
         },
         configurable: true,
       },
       isRunning: {
         get() {
-          return registry.isRunning;
+          return source.isRunning;
         },
         set(v: boolean) {
-          registry.isRunning = v;
+          source.isRunning = v;
         },
         configurable: true,
       },
@@ -143,27 +172,27 @@ export class MockStepwiseAgent extends AbstractAgent {
       "state",
       "isRunning",
     ]);
-    for (const key of Object.keys(registry as Record<string, unknown>)) {
+    for (const key of Object.keys(source as Record<string, unknown>)) {
       if (internalKeys.has(key)) continue;
       Object.defineProperty(cloned, key, {
         get() {
-          return (registry as Record<string, unknown>)[key];
+          return (source as Record<string, unknown>)[key];
         },
         set(v: unknown) {
-          (registry as Record<string, unknown>)[key] = v;
+          (source as Record<string, unknown>)[key] = v;
         },
         configurable: true,
       });
     }
 
     cloned.run = function (input: RunAgentInput): Observable<BaseEvent> {
-      return registry.run(input);
+      return source.run(input);
     };
     cloned.emit = function (event: BaseEvent): Promise<void> {
-      return registry.emit(event);
+      return source.emit(event);
     };
     cloned.complete = function (): Promise<void> {
-      return registry.complete();
+      return source.complete();
     };
     return cloned;
   }
@@ -250,7 +279,7 @@ export class MockReconnectableAgent extends AbstractAgent {
   clone(): MockReconnectableAgent {
     const cloned = new MockReconnectableAgent();
     cloned.agentId = this.agentId;
-    const registry = this;
+    const source = cloneBacking(this);
     (
       cloned as unknown as {
         subject: Subject<BaseEvent>;
@@ -300,37 +329,37 @@ export class MockReconnectableAgent extends AbstractAgent {
     Object.defineProperties(cloned, {
       threadId: {
         get() {
-          return registry.threadId;
+          return source.threadId;
         },
         set(v: string) {
-          registry.threadId = v;
+          source.threadId = v;
         },
         configurable: true,
       },
       messages: {
         get() {
-          return registry.messages;
+          return source.messages;
         },
         set(v: BaseEvent[]) {
-          (registry as unknown as { messages: BaseEvent[] }).messages = v;
+          (source as unknown as { messages: BaseEvent[] }).messages = v;
         },
         configurable: true,
       },
       state: {
         get() {
-          return registry.state;
+          return source.state;
         },
         set(v: Record<string, unknown>) {
-          registry.state = v;
+          source.state = v;
         },
         configurable: true,
       },
       isRunning: {
         get() {
-          return registry.isRunning;
+          return source.isRunning;
         },
         set(v: boolean) {
-          registry.isRunning = v;
+          source.isRunning = v;
         },
         configurable: true,
       },
@@ -348,30 +377,30 @@ export class MockReconnectableAgent extends AbstractAgent {
       "state",
       "isRunning",
     ]);
-    for (const key of Object.keys(registry as Record<string, unknown>)) {
+    for (const key of Object.keys(source as Record<string, unknown>)) {
       if (internalKeys.has(key)) continue;
       Object.defineProperty(cloned, key, {
         get() {
-          return (registry as Record<string, unknown>)[key];
+          return (source as Record<string, unknown>)[key];
         },
         set(v: unknown) {
-          (registry as Record<string, unknown>)[key] = v;
+          (source as Record<string, unknown>)[key] = v;
         },
         configurable: true,
       });
     }
 
     cloned.run = function (input: RunAgentInput): Observable<BaseEvent> {
-      return registry.run(input);
+      return source.run(input);
     };
     cloned.connect = function (input: RunAgentInput): Observable<BaseEvent> {
-      return registry.connect(input);
+      return source.connect(input);
     };
     cloned.emit = function (event: BaseEvent): Promise<void> {
-      return registry.emit(event);
+      return source.emit(event);
     };
     cloned.complete = function (): Promise<void> {
-      return registry.complete();
+      return source.complete();
     };
     return cloned;
   }

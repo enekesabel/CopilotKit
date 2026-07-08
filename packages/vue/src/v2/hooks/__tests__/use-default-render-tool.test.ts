@@ -1,8 +1,25 @@
 import { fireEvent, render, screen } from "@testing-library/vue";
 import { defineComponent } from "vue";
+import type { Component } from "vue";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useDefaultRenderTool } from "../use-default-render-tool";
 import { useRenderTool } from "../use-render-tool";
+
+type DefaultRendererTestProps = {
+  name: string;
+  toolCallId: string;
+  parameters?: unknown;
+  args?: unknown;
+  status: string;
+  result?: unknown;
+};
+
+function renderCapturedDefaultRenderer(
+  renderer: unknown,
+  props: DefaultRendererTestProps,
+) {
+  return render(renderer as Component<DefaultRendererTestProps>, { props });
+}
 
 vi.mock("../use-render-tool", () => ({
   useRenderTool: vi.fn(),
@@ -223,14 +240,12 @@ describe("useDefaultRenderTool", () => {
     const DefaultRenderer = config.render;
     const structuredResult = { ok: true, count: 3 };
 
-    render(DefaultRenderer as any, {
-      props: {
-        name: "searchDocs",
-        toolCallId: "tc-nonstring-result",
-        parameters: { query: "copilot" },
-        status: "complete",
-        result: structuredResult,
-      },
+    renderCapturedDefaultRenderer(DefaultRenderer, {
+      name: "searchDocs",
+      toolCallId: "tc-nonstring-result",
+      parameters: { query: "copilot" },
+      status: "complete",
+      result: structuredResult,
     });
 
     const wrapper = screen.getByTestId("copilot-tool-render");
@@ -313,14 +328,12 @@ describe("useDefaultRenderTool", () => {
     ];
 
     const DefaultRenderer = config.render;
-    render(DefaultRenderer as any, {
-      props: {
-        name: "searchDocs",
-        toolCallId: "tc-default-executing",
-        parameters: { query: "copilot" },
-        status: "executing",
-        result: undefined,
-      },
+    renderCapturedDefaultRenderer(DefaultRenderer, {
+      name: "searchDocs",
+      toolCallId: "tc-default-executing",
+      parameters: { query: "copilot" },
+      status: "executing",
+      result: undefined,
     });
 
     expect(screen.getByText("searchDocs")).toBeDefined();
@@ -349,14 +362,12 @@ describe("useDefaultRenderTool", () => {
     ];
 
     const DefaultRenderer = config.render;
-    render(DefaultRenderer as any, {
-      props: {
-        name: "searchDocs",
-        toolCallId: "tc-default-complete",
-        parameters: { query: "copilot" },
-        status: "complete",
-        result: "done",
-      },
+    renderCapturedDefaultRenderer(DefaultRenderer, {
+      name: "searchDocs",
+      toolCallId: "tc-default-complete",
+      parameters: { query: "copilot" },
+      status: "complete",
+      result: "done",
     });
 
     expect(screen.getByText("Done")).toBeDefined();
@@ -383,14 +394,12 @@ describe("useDefaultRenderTool", () => {
     ];
 
     const DefaultRenderer = config.render;
-    render(DefaultRenderer as any, {
-      props: {
-        name: "searchDocs",
-        toolCallId: "tc-testid-1",
-        parameters: { query: "copilot" },
-        status: "complete",
-        result: "ok",
-      },
+    renderCapturedDefaultRenderer(DefaultRenderer, {
+      name: "searchDocs",
+      toolCallId: "tc-testid-1",
+      parameters: { query: "copilot" },
+      status: "complete",
+      result: "ok",
     });
 
     const wrapper = screen.getByTestId("copilot-tool-render");
@@ -428,14 +437,12 @@ describe("useDefaultRenderTool", () => {
     ];
 
     const DefaultRenderer = config.render;
-    render(DefaultRenderer as any, {
-      props: {
-        name: "searchDocs",
-        toolCallId: "tc-a11y",
-        parameters: { query: "copilot" },
-        status: "executing",
-        result: undefined,
-      },
+    renderCapturedDefaultRenderer(DefaultRenderer, {
+      name: "searchDocs",
+      toolCallId: "tc-a11y",
+      parameters: { query: "copilot" },
+      status: "executing",
+      result: undefined,
     });
 
     const nameNode = screen.getByTestId("copilot-tool-render-name");
@@ -467,14 +474,12 @@ describe("useDefaultRenderTool", () => {
     ];
 
     const DefaultRenderer = config.render;
-    render(DefaultRenderer as any, {
-      props: {
-        name: "searchDocs",
-        toolCallId: "tc-id-emit",
-        parameters: { query: "copilot" },
-        status: "complete",
-        result: "ok",
-      },
+    renderCapturedDefaultRenderer(DefaultRenderer, {
+      name: "searchDocs",
+      toolCallId: "tc-id-emit",
+      parameters: { query: "copilot" },
+      status: "complete",
+      result: "ok",
     });
 
     const wrapper = screen.getByTestId("copilot-tool-render");
@@ -556,14 +561,12 @@ describe("useDefaultRenderTool", () => {
     circular.self = circular;
 
     expect(() =>
-      render(DefaultRenderer as any, {
-        props: {
-          name: "circ",
-          toolCallId: "tc-circular",
-          parameters: circular,
-          status: "executing",
-          result: undefined,
-        },
+      renderCapturedDefaultRenderer(DefaultRenderer, {
+        name: "circ",
+        toolCallId: "tc-circular",
+        parameters: circular,
+        status: "executing",
+        result: undefined,
       }),
     ).not.toThrow();
 
