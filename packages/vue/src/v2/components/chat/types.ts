@@ -102,7 +102,7 @@ export interface CopilotChatProps extends Omit<
   onError?: (event: {
     error: Error;
     code: CopilotKitCoreErrorCode;
-    // Opaque error context payload; matches React API (enekesabel/CopilotKit#4).
+    // Opaque error context payload; matches React API (enekesabel/CopilotKit#7).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     context: Record<string, any>;
   }) => void | Promise<void>;

@@ -1,4 +1,5 @@
-import { computed, defineComponent, h, type PropType } from "vue";
+import { computed, defineComponent, h } from "vue";
+import type { PropType } from "vue";
 import { z } from "zod";
 import type { VueActivityMessageRenderer } from "../types";
 import type { A2UITheme } from "../types";
@@ -8,6 +9,8 @@ const A2UI_OPERATIONS_KEY = "a2ui_operations";
 
 export type A2UIMessageRendererOptions = {
   theme: A2UITheme;
+  // A2UI catalog typing deferred (enekesabel/CopilotKit#6).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   catalog?: any;
   loadingComponent?: unknown;
 };
@@ -79,6 +82,8 @@ const DefaultA2UILoading = defineComponent({
 
 export function createA2UIMessageRenderer(
   options: A2UIMessageRendererOptions,
+  // A2UI activity content typing deferred (enekesabel/CopilotKit#6).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): VueActivityMessageRenderer<any> {
   return {
     activityType: "a2ui-surface",
@@ -87,9 +92,12 @@ export function createA2UIMessageRenderer(
       name: "A2UIMessageRendererHost",
       props: {
         activityType: { type: String, required: true },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         content: { type: Object as PropType<any>, required: true },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         message: { type: Object as PropType<any>, required: true },
         agent: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           type: Object as PropType<any>,
           required: false,
           default: undefined,
@@ -105,6 +113,7 @@ export function createA2UIMessageRenderer(
         return () => {
           if (operations.value.length === 0) {
             if (options.loadingComponent) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               return h(options.loadingComponent as any);
             }
             return h(DefaultA2UILoading);

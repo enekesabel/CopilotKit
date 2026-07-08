@@ -2,7 +2,12 @@ import { render } from "@testing-library/vue";
 import { DEFAULT_AGENT_ID } from "@copilotkit/shared";
 import { AbstractAgent, EventType } from "@ag-ui/client";
 import type { BaseEvent, RunAgentInput } from "@ag-ui/client";
-import type { AssistantMessage } from "@ag-ui/core";
+import type {
+  AssistantMessage,
+  RunErrorEvent,
+  ToolMessage,
+  UserMessage,
+} from "@ag-ui/core";
 import { Observable, Subject, from, delay } from "rxjs";
 import { defineComponent, nextTick } from "vue";
 import type { Component } from "vue";
@@ -35,6 +40,37 @@ export function assistantMessageWithToolCall(args: {
         },
       },
     ],
+  };
+}
+
+export function runErrorEvent(message = "Test error"): RunErrorEvent {
+  return {
+    type: EventType.RUN_ERROR,
+    message,
+  };
+}
+
+export function userMessage(args: {
+  id: string;
+  content: string;
+}): UserMessage {
+  return {
+    id: args.id,
+    role: "user",
+    content: args.content,
+  };
+}
+
+export function toolMessage(args: {
+  id: string;
+  toolCallId: string;
+  content: string;
+}): ToolMessage {
+  return {
+    id: args.id,
+    role: "tool",
+    toolCallId: args.toolCallId,
+    content: args.content,
   };
 }
 

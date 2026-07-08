@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/vue";
 import { defineComponent } from "vue";
+import type { WatchSource } from "vue";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { z } from "zod";
 import { useComponent } from "../use-component";
@@ -76,7 +77,7 @@ describe("useComponent", () => {
             render: DemoComponent,
             agentId: "weather-agent",
           },
-          deps as unknown as any[],
+          deps as unknown as WatchSource<unknown>[],
         );
         return {};
       },

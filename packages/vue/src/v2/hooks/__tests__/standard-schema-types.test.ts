@@ -116,6 +116,8 @@ describe("RenderToolProps type inference", () => {
 describe("VueToolCallRenderer type inference", () => {
   it("args field accepts a StandardSchemaV1", () => {
     expectTypeOf<VueToolCallRenderer<{ x: number }>["args"]>().toMatchTypeOf<
+      // Schema input typing deferred (enekesabel/CopilotKit#5).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       StandardSchemaV1<any, { x: number }>
     >();
   });
@@ -125,7 +127,9 @@ describe("useComponent type inference", () => {
   it("InferRenderProps extracts output from StandardSchemaV1", () => {
     type InferRenderProps<T> = T extends StandardSchemaV1
       ? InferSchemaOutput<T>
-      : any;
+      : // No-schema fallback deferred (enekesabel/CopilotKit#5).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any;
 
     const zodSchema = z.object({ city: z.string() });
     expectTypeOf(zodSchema).toMatchTypeOf<StandardSchemaV1>();
@@ -149,7 +153,9 @@ describe("useComponent type inference", () => {
   it("InferRenderProps returns any for undefined", () => {
     type InferRenderProps<T> = T extends StandardSchemaV1
       ? InferSchemaOutput<T>
-      : any;
+      : // No-schema fallback deferred (enekesabel/CopilotKit#5).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any;
 
     expectTypeOf<InferRenderProps<undefined>>().toBeAny();
   });

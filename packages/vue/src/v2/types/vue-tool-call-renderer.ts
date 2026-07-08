@@ -38,6 +38,8 @@ export type VueToolCallRendererRenderFn<T> =
 
 export interface VueToolCallRenderer<T = unknown> {
   name: string;
+  // Schema input typing deferred (enekesabel/CopilotKit#5).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: StandardSchemaV1<any, T>;
   agentId?: string;
   render: VueToolCallRendererRenderFn<T>;

@@ -34,6 +34,17 @@ type ThreadState = {
   } | null;
 };
 
+type MockThreadMetadataPayload =
+  | { operation: "deleted"; deleted: { id: string } }
+  | { thread: ThreadRecord };
+
+type MockSocketHandle = {
+  connected: boolean;
+  disconnected: boolean;
+  channels: unknown[];
+  triggerError: () => void;
+};
+
 const select = <T>(selector: (state: ThreadState) => T) => selector;
 
 vi.mock("../../providers/useCopilotKit", () => ({
@@ -42,7 +53,7 @@ vi.mock("../../providers/useCopilotKit", () => ({
 
 const mockUseCopilotKit = useCopilotKit as ReturnType<typeof vi.fn>;
 const threadMocks = vi.hoisted(() => ({
-  sockets: [] as unknown[],
+  sockets: [] as MockSocketHandle[],
   dispatchedContexts: [] as Array<ThreadState["context"]>,
 }));
 
@@ -67,7 +78,7 @@ vi.mock("@copilotkit/core", () => {
       this.left = true;
     }
 
-    serverPush(event: string, payload: any): void {
+    serverPush(event: string, payload: MockThreadMetadataPayload): void {
       if (event !== "thread_metadata") return;
       this.store.applyMetadata(payload);
     }
@@ -212,7 +223,7 @@ vi.mock("@copilotkit/core", () => {
       }
     }
 
-    applyMetadata(payload: any): void {
+    applyMetadata(payload: MockThreadMetadataPayload): void {
       if (!this.state.context) {
         return;
       }
@@ -361,7 +372,7 @@ globalThis.fetch = fetchMock;
 const { CopilotKitCoreRuntimeConnectionStatus } =
   await import("@copilotkit/core");
 
-function getMockSockets(): any[] {
+function getMockSockets(): MockSocketHandle[] {
   return threadMocks.sockets;
 }
 

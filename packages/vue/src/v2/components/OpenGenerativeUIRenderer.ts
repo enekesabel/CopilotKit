@@ -92,6 +92,8 @@ type WebsandboxModule = {
 };
 
 async function loadWebsandbox(): Promise<WebsandboxModule> {
+  // Websandbox dynamic import shape deferred (enekesabel/CopilotKit#6).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mod = (await import("@jetbrains/websandbox")) as any;
   return (mod.default?.default ?? mod.default) as WebsandboxModule;
 }

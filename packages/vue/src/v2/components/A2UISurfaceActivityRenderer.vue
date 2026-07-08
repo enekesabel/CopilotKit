@@ -18,6 +18,8 @@ const props = defineProps<{
   message: ActivityMessage;
   agent?: object;
   theme?: A2UITheme;
+  // A2UI catalog typing deferred (enekesabel/CopilotKit#6).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   catalog?: any;
 }>();
 
@@ -54,6 +56,7 @@ async function handleAction(message: unknown) {
       ...copilotkit.value.properties,
       a2uiAction: message,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await copilotkit.value.runAgent({ agent: props.agent as any });
   } finally {
     const { a2uiAction, ...rest } = copilotkit.value.properties ?? {};
@@ -82,8 +85,10 @@ function processOperations(operations: A2UIOperation[]) {
     for (const [surfaceId, ops] of grouped) {
       const existing = processor.model.getSurface(surfaceId);
       const filtered = existing
-        ? ops.filter((op) => !(op as any)?.createSurface)
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ops.filter((op) => !(op as any)?.createSurface)
         : ops;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       processor.processMessages(filtered as any);
     }
     error.value = null;
