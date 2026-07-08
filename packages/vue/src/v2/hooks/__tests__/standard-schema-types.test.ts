@@ -64,6 +64,7 @@ describe("RenderToolProps type inference", () => {
         city: v.string(),
         temp: v.number(),
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolInProgressProps<S>["parameters"]>().toEqualTypeOf<
@@ -75,6 +76,7 @@ describe("RenderToolProps type inference", () => {
       const schema = v.object({
         city: v.string(),
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolExecutingProps<S>["parameters"]>().toEqualTypeOf<{
@@ -89,6 +91,7 @@ describe("RenderToolProps type inference", () => {
         query: "string",
         limit: "number",
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolInProgressProps<S>["parameters"]>().toEqualTypeOf<
@@ -100,6 +103,7 @@ describe("RenderToolProps type inference", () => {
       const schema = type({
         query: "string",
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolCompleteProps<S>["parameters"]>().toEqualTypeOf<{
@@ -124,16 +128,19 @@ describe("useComponent type inference", () => {
       : any;
 
     const zodSchema = z.object({ city: z.string() });
+    expectTypeOf(zodSchema).toMatchTypeOf<StandardSchemaV1>();
     expectTypeOf<InferRenderProps<typeof zodSchema>>().toEqualTypeOf<{
       city: string;
     }>();
 
     const valibotSchema = v.object({ query: v.string() });
+    expectTypeOf(valibotSchema).toMatchTypeOf<StandardSchemaV1>();
     expectTypeOf<InferRenderProps<typeof valibotSchema>>().toEqualTypeOf<{
       query: string;
     }>();
 
     const arktypeSchema = type({ id: "string" });
+    expectTypeOf(arktypeSchema).toMatchTypeOf<StandardSchemaV1>();
     expectTypeOf<InferRenderProps<typeof arktypeSchema>>().toEqualTypeOf<{
       id: string;
     }>();
