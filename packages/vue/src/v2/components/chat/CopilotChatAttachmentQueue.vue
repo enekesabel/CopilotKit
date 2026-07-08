@@ -47,7 +47,7 @@ const lightboxDocumentSource = computed(() => {
 
 watch(
   activeLightboxAttachment,
-  (next, previous) => {
+  (next) => {
     if (documentBlobUrl.value) {
       URL.revokeObjectURL(documentBlobUrl.value);
       documentBlobUrl.value = null;

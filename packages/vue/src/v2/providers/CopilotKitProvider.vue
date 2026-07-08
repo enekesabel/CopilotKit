@@ -9,7 +9,6 @@ import {
   watch,
 } from "vue";
 import { z } from "zod";
-import type { AbstractAgent } from "@ag-ui/client";
 import type {
   CopilotKitCoreErrorCode,
   CopilotKitCoreSubscriber,
@@ -47,7 +46,6 @@ import type {
   SandboxFunction,
   VueActivityMessageRenderer,
   VueFrontendTool,
-  VueHumanInTheLoop,
   VueToolCallRenderer,
 } from "../types";
 

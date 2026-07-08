@@ -1,13 +1,7 @@
 import { render } from "@testing-library/vue";
 import { DEFAULT_AGENT_ID } from "@copilotkit/shared";
 import { AbstractAgent, EventType } from "@ag-ui/client";
-import type {
-  AgentSubscriber,
-  BaseEvent,
-  RunAgentInput,
-  RunAgentParameters,
-  RunAgentResult,
-} from "@ag-ui/client";
+import type { BaseEvent, RunAgentInput } from "@ag-ui/client";
 import { Observable, Subject, from, delay } from "rxjs";
 import { defineComponent, nextTick } from "vue";
 import type { Component } from "vue";

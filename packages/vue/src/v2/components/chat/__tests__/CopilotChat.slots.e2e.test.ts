@@ -11,7 +11,7 @@ describe("CopilotChat.slots.e2e", () => {
     const agent = new StateCapturingAgent([], "default");
     const onSubmitSpy = vi.fn();
 
-    const { wrapper, getCore } = renderWithCopilotKit(
+    const { wrapper } = renderWithCopilotKit(
       () =>
         h(
           CopilotChat,

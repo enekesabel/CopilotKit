@@ -117,7 +117,7 @@ watch(
     () => copilotkit.value,
     () => copilotkit.value.runtimeConnectionStatus,
   ],
-  ([_agentId, threadId], _prev, onCleanup) => {
+  ([, threadId], _prev, onCleanup) => {
     const registryAgent = copilotkit.value.getAgent(resolvedAgentId.value);
     const agent = getThreadClone(registryAgent, threadId) ?? registryAgent;
     if (!agent) return;
@@ -329,17 +329,6 @@ function resolveActivityRenderer(
       agent: resolvedThreadAgent.value,
     },
   };
-}
-
-function resolveToolMessage(
-  message: Message,
-  toolCallId: string,
-): ToolMessage | undefined {
-  return props.messages.find(
-    (candidate) =>
-      candidate.role === "tool" &&
-      (candidate as ToolMessage).toolCallId === toolCallId,
-  ) as ToolMessage | undefined;
 }
 </script>
 
