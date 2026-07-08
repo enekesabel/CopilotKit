@@ -1,12 +1,5 @@
-import {
-  computed,
-  defineComponent,
-  h,
-  onBeforeUnmount,
-  ref,
-  watch,
-  type PropType,
-} from "vue";
+import { computed, defineComponent, h, onBeforeUnmount, ref, watch } from "vue";
+import type { PropType } from "vue";
 import { z } from "zod";
 import { ToolCallStatus } from "@copilotkit/core";
 import {
@@ -83,7 +76,7 @@ function injectCssIntoHtml(html: string, css: string): string {
 type SandboxInstance = {
   iframe: HTMLIFrameElement;
   promise: Promise<unknown>;
-  run: (code: string | Function) => Promise<unknown>;
+  run: (code: string | ((...args: unknown[]) => unknown)) => Promise<unknown>;
   destroy: () => void;
 };
 

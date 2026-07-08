@@ -130,7 +130,7 @@ export interface CopilotChatScrollToBottomButtonSlotProps {
   onClick: () => void;
 }
 
-export interface CopilotChatFeatherSlotProps {}
+export type CopilotChatFeatherSlotProps = Record<string, never>;
 
 export interface CopilotChatScrollViewSlotProps
   extends CopilotChatMessageViewSlotProps, CopilotChatSuggestionViewSlotProps {
@@ -182,7 +182,8 @@ export interface CopilotChatSuggestionViewContainerSlotProps extends CopilotChat
   containerAttrs: Record<string, unknown>;
 }
 
-export interface CopilotChatSuggestionViewLayoutSlotProps extends CopilotChatSuggestionViewContainerSlotProps {}
+export type CopilotChatSuggestionViewLayoutSlotProps =
+  CopilotChatSuggestionViewContainerSlotProps;
 
 export interface CopilotChatWelcomeScreenSlotProps extends CopilotChatSuggestionViewSlotProps {
   modelValue: string;
