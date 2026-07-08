@@ -39,4 +39,15 @@ export default [
       },
     },
   },
+  {
+    files: ["**/*.{ts,mts,cts,tsx}", "**/*.vue"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
 ];
