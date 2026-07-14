@@ -11,6 +11,7 @@ import {
   runFinishedEvent,
   textChunkEvent,
   testId,
+  userMessage,
 } from "../../__tests__/utils/test-helpers";
 import { useAgent } from "../use-agent";
 import { useCopilotKit } from "../../providers/useCopilotKit";
@@ -87,11 +88,12 @@ describe("useAgent e2e", () => {
           const { copilotkit } = useCopilotKit();
 
           const handleAddMessageAndRun = async () => {
-            hookAgent.value.addMessage({
-              id: testId("user-msg"),
-              role: "user",
-              content: "Hello from useAgent!",
-            } as any);
+            hookAgent.value.addMessage(
+              userMessage({
+                id: testId("user-msg"),
+                content: "Hello from useAgent!",
+              }),
+            );
             await copilotkit.value.runAgent({ agent: hookAgent.value });
           };
 

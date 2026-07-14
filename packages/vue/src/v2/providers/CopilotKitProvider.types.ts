@@ -28,6 +28,8 @@ export interface CopilotKitProviderProps {
   useSingleEndpoint?: boolean;
   agents__unsafe_dev_only?: Record<string, AbstractAgent>;
   selfManagedAgents?: Record<string, AbstractAgent>;
+  // Public extension-point typing deferred (enekesabel/CopilotKit#7).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   renderToolCalls?: VueToolCallRenderer<any>[];
   renderActivityMessages?: VueActivityMessageRenderer<unknown>[];
   renderCustomMessages?: VueCustomMessageRenderer[];
@@ -41,10 +43,14 @@ export interface CopilotKitProviderProps {
   onError?: (event: {
     error: Error;
     code: CopilotKitCoreErrorCode;
+    // Opaque error context payload; matches React API (enekesabel/CopilotKit#7).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     context: Record<string, any>;
   }) => void | Promise<void>;
   a2ui?: {
     theme?: A2UITheme;
+    // A2UI catalog typing deferred (enekesabel/CopilotKit#7).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catalog?: any;
     loadingComponent?: Component;
     includeSchema?: boolean;

@@ -64,6 +64,7 @@ describe("RenderToolProps type inference", () => {
         city: v.string(),
         temp: v.number(),
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolInProgressProps<S>["parameters"]>().toEqualTypeOf<
@@ -75,6 +76,7 @@ describe("RenderToolProps type inference", () => {
       const schema = v.object({
         city: v.string(),
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolExecutingProps<S>["parameters"]>().toEqualTypeOf<{
@@ -89,6 +91,7 @@ describe("RenderToolProps type inference", () => {
         query: "string",
         limit: "number",
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolInProgressProps<S>["parameters"]>().toEqualTypeOf<
@@ -100,6 +103,7 @@ describe("RenderToolProps type inference", () => {
       const schema = type({
         query: "string",
       });
+      expectTypeOf(schema).toMatchTypeOf<StandardSchemaV1>();
       type S = typeof schema;
 
       expectTypeOf<RenderToolCompleteProps<S>["parameters"]>().toEqualTypeOf<{
@@ -112,6 +116,8 @@ describe("RenderToolProps type inference", () => {
 describe("VueToolCallRenderer type inference", () => {
   it("args field accepts a StandardSchemaV1", () => {
     expectTypeOf<VueToolCallRenderer<{ x: number }>["args"]>().toMatchTypeOf<
+      // Schema input typing deferred (enekesabel/CopilotKit#5).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       StandardSchemaV1<any, { x: number }>
     >();
   });
@@ -121,19 +127,24 @@ describe("useComponent type inference", () => {
   it("InferRenderProps extracts output from StandardSchemaV1", () => {
     type InferRenderProps<T> = T extends StandardSchemaV1
       ? InferSchemaOutput<T>
-      : any;
+      : // No-schema fallback deferred (enekesabel/CopilotKit#5).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any;
 
     const zodSchema = z.object({ city: z.string() });
+    expectTypeOf(zodSchema).toMatchTypeOf<StandardSchemaV1>();
     expectTypeOf<InferRenderProps<typeof zodSchema>>().toEqualTypeOf<{
       city: string;
     }>();
 
     const valibotSchema = v.object({ query: v.string() });
+    expectTypeOf(valibotSchema).toMatchTypeOf<StandardSchemaV1>();
     expectTypeOf<InferRenderProps<typeof valibotSchema>>().toEqualTypeOf<{
       query: string;
     }>();
 
     const arktypeSchema = type({ id: "string" });
+    expectTypeOf(arktypeSchema).toMatchTypeOf<StandardSchemaV1>();
     expectTypeOf<InferRenderProps<typeof arktypeSchema>>().toEqualTypeOf<{
       id: string;
     }>();
@@ -142,7 +153,9 @@ describe("useComponent type inference", () => {
   it("InferRenderProps returns any for undefined", () => {
     type InferRenderProps<T> = T extends StandardSchemaV1
       ? InferSchemaOutput<T>
-      : any;
+      : // No-schema fallback deferred (enekesabel/CopilotKit#5).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any;
 
     expectTypeOf<InferRenderProps<undefined>>().toBeAny();
   });

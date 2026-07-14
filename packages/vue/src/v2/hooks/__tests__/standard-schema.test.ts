@@ -103,6 +103,7 @@ describe("useRenderTool with Standard Schema", () => {
             {
               name: "searchValibot",
               parameters: schema as unknown as StandardSchemaV1<
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 any,
                 { query: string }
               >,
@@ -139,6 +140,7 @@ describe("useRenderTool with Standard Schema", () => {
             {
               name: "searchArktype",
               parameters: schema as unknown as StandardSchemaV1<
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 any,
                 { query: string }
               >,
@@ -189,6 +191,8 @@ describe("useRenderTool with Standard Schema", () => {
               name: "valibotRenderer",
               parameters: v.object({
                 b: v.string(),
+                // Schema input typing deferred (enekesabel/CopilotKit#5).
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
               }) as unknown as StandardSchemaV1<any, { b: string }>,
               render: () => "valibot",
             },
@@ -206,6 +210,8 @@ describe("useRenderTool with Standard Schema", () => {
               name: "arktypeRenderer",
               parameters: type({
                 c: "string",
+                // Schema input typing deferred (enekesabel/CopilotKit#5).
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
               }) as unknown as StandardSchemaV1<any, { c: string }>,
               render: () => "arktype",
             },
@@ -258,6 +264,7 @@ describe("useComponent with Standard Schema", () => {
         useComponent({
           name: "weatherCard",
           parameters: schema as unknown as StandardSchemaV1<
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             any,
             { city: string }
           >,
@@ -272,6 +279,8 @@ describe("useComponent with Standard Schema", () => {
 
     expect(mockUseFrontendTool).toHaveBeenCalledTimes(1);
     const [toolConfig] = mockUseFrontendTool.mock.calls[0] as [
+      // Schema vendor metadata assertion deferred (enekesabel/CopilotKit#5).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { name: string; parameters: any },
     ];
     expect(toolConfig.name).toBe("weatherCard");
@@ -293,6 +302,7 @@ describe("useComponent with Standard Schema", () => {
         useComponent({
           name: "weatherCardArk",
           parameters: schema as unknown as StandardSchemaV1<
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             any,
             { city: string }
           >,
@@ -307,6 +317,8 @@ describe("useComponent with Standard Schema", () => {
 
     expect(mockUseFrontendTool).toHaveBeenCalledTimes(1);
     const [toolConfig] = mockUseFrontendTool.mock.calls[0] as [
+      // Schema vendor metadata assertion deferred (enekesabel/CopilotKit#5).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { name: string; parameters: any },
     ];
     expect(toolConfig.name).toBe("weatherCardArk");

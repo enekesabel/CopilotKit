@@ -1,24 +1,14 @@
 <script setup lang="ts">
-import {
-  computed,
-  h,
-  onBeforeUnmount,
-  shallowRef,
-  ref,
-  watch,
-  type VNode,
-} from "vue";
+import { computed, onBeforeUnmount, shallowRef, ref, watch } from "vue";
 import type { ActivityMessage } from "@ag-ui/core";
 import type { A2UITheme } from "../types";
 import type { A2UIOperation } from "./a2ui";
 import { getOperationSurfaceId } from "./a2ui";
 import { useCopilotKit } from "../providers";
-import { MessageProcessor, type SurfaceModel } from "@a2ui/web_core/v0_9";
-import {
-  vueBasicCatalog,
-  A2uiSurface,
-  type VueComponentImplementation,
-} from "./a2ui/index";
+import { MessageProcessor } from "@a2ui/web_core/v0_9";
+import type { SurfaceModel } from "@a2ui/web_core/v0_9";
+import { vueBasicCatalog, A2uiSurface } from "./a2ui/index";
+import type { VueComponentImplementation } from "./a2ui/index";
 
 const DEFAULT_SURFACE_ID = "default";
 
@@ -28,6 +18,8 @@ const props = defineProps<{
   message: ActivityMessage;
   agent?: object;
   theme?: A2UITheme;
+  // A2UI catalog typing deferred (enekesabel/CopilotKit#6).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   catalog?: any;
 }>();
 
@@ -61,9 +53,10 @@ async function handleAction(message: unknown) {
   if (!props.agent) return;
   try {
     copilotkit.value.setProperties({
-      ...(copilotkit.value.properties ?? {}),
+      ...copilotkit.value.properties,
       a2uiAction: message,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await copilotkit.value.runAgent({ agent: props.agent as any });
   } finally {
     const { a2uiAction, ...rest } = copilotkit.value.properties ?? {};
@@ -92,8 +85,10 @@ function processOperations(operations: A2UIOperation[]) {
     for (const [surfaceId, ops] of grouped) {
       const existing = processor.model.getSurface(surfaceId);
       const filtered = existing
-        ? ops.filter((op) => !(op as any)?.createSurface)
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ops.filter((op) => !(op as any)?.createSurface)
         : ops;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       processor.processMessages(filtered as any);
     }
     error.value = null;

@@ -203,6 +203,7 @@ describe("defineToolCallRenderer Zod regression", () => {
     });
 
     expect(renderer.name).toBe("*");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((renderer.args as any)["~standard"].vendor).toBe("zod");
   });
 
@@ -288,6 +289,8 @@ describe("useComponent Zod regression", () => {
 
     expect(mockUseFrontendTool).toHaveBeenCalledTimes(1);
     const [toolConfig] = mockUseFrontendTool.mock.calls[0] as [
+      // Schema vendor metadata assertion deferred (enekesabel/CopilotKit#5).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { name: string; parameters: any },
     ];
     expect(toolConfig.name).toBe("weatherCard");
@@ -331,6 +334,8 @@ describe("useComponent Zod regression", () => {
 
     expect(mockUseFrontendTool).toHaveBeenCalledTimes(1);
     const [toolConfig] = mockUseFrontendTool.mock.calls[0] as [
+      // Schema vendor metadata assertion deferred (enekesabel/CopilotKit#5).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       { name: string; parameters: any },
     ];
     expect(toolConfig.name).toBe("dataGrid");

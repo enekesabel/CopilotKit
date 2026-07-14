@@ -102,6 +102,8 @@ export interface CopilotChatProps extends Omit<
   onError?: (event: {
     error: Error;
     code: CopilotKitCoreErrorCode;
+    // Opaque error context payload; matches React API (enekesabel/CopilotKit#7).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     context: Record<string, any>;
   }) => void | Promise<void>;
 }
@@ -130,7 +132,7 @@ export interface CopilotChatScrollToBottomButtonSlotProps {
   onClick: () => void;
 }
 
-export interface CopilotChatFeatherSlotProps {}
+export type CopilotChatFeatherSlotProps = Record<string, never>;
 
 export interface CopilotChatScrollViewSlotProps
   extends CopilotChatMessageViewSlotProps, CopilotChatSuggestionViewSlotProps {
@@ -182,7 +184,8 @@ export interface CopilotChatSuggestionViewContainerSlotProps extends CopilotChat
   containerAttrs: Record<string, unknown>;
 }
 
-export interface CopilotChatSuggestionViewLayoutSlotProps extends CopilotChatSuggestionViewContainerSlotProps {}
+export type CopilotChatSuggestionViewLayoutSlotProps =
+  CopilotChatSuggestionViewContainerSlotProps;
 
 export interface CopilotChatWelcomeScreenSlotProps extends CopilotChatSuggestionViewSlotProps {
   modelValue: string;

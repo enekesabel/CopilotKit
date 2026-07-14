@@ -75,6 +75,8 @@ defineSlots<{
     isRunning: boolean;
   }) => unknown;
   "activity-message"?: (props: ActivitySlotProps) => unknown;
+  // Catch-all supports dynamic slot forwarding until typed slot families land (enekesabel/CopilotKit#4).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: ((props: any) => unknown) | undefined;
   cursor?: () => unknown;
   "tool-call"?: (props: {
@@ -99,6 +101,8 @@ const { copilotkit } = useCopilotKit();
 const config = useCopilotChatConfiguration();
 const stateTick = ref(0);
 const interruptState = ref<InterruptSlotProps | null>(null);
+// Forwarded slots use catch-all typing until typed slot families land (enekesabel/CopilotKit#4).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const componentSlots = useSlots() as Record<string, (props?: any) => unknown>;
 const forwardedSlotNames = computed(() => Object.keys(componentSlots));
 const resolvedAgentId = computed(
@@ -117,7 +121,7 @@ watch(
     () => copilotkit.value,
     () => copilotkit.value.runtimeConnectionStatus,
   ],
-  ([_agentId, threadId], _prev, onCleanup) => {
+  ([, threadId], _prev, onCleanup) => {
     const registryAgent = copilotkit.value.getAgent(resolvedAgentId.value);
     const agent = getThreadClone(registryAgent, threadId) ?? registryAgent;
     if (!agent) return;
@@ -329,17 +333,6 @@ function resolveActivityRenderer(
       agent: resolvedThreadAgent.value,
     },
   };
-}
-
-function resolveToolMessage(
-  message: Message,
-  toolCallId: string,
-): ToolMessage | undefined {
-  return props.messages.find(
-    (candidate) =>
-      candidate.role === "tool" &&
-      (candidate as ToolMessage).toolCallId === toolCallId,
-  ) as ToolMessage | undefined;
 }
 </script>
 

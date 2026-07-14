@@ -9,7 +9,6 @@ import {
   watch,
 } from "vue";
 import { z } from "zod";
-import type { AbstractAgent } from "@ag-ui/client";
 import type {
   CopilotKitCoreErrorCode,
   CopilotKitCoreSubscriber,
@@ -47,7 +46,6 @@ import type {
   SandboxFunction,
   VueActivityMessageRenderer,
   VueFrontendTool,
-  VueHumanInTheLoop,
   VueToolCallRenderer,
 } from "../types";
 
@@ -465,6 +463,8 @@ watch(
       onError: (event: {
         error: Error;
         code: CopilotKitCoreErrorCode;
+        // Opaque error context payload; matches React API (enekesabel/CopilotKit#7).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         context: Record<string, any>;
       }) => {
         void props.onError?.({

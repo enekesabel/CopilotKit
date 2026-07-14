@@ -19,6 +19,7 @@ import {
 } from "../MCPAppsActivityRenderer";
 import {
   activitySnapshotEvent,
+  cloneBacking,
   runFinishedEvent,
   runStartedEvent,
 } from "../../__tests__/utils/test-helpers";
@@ -72,13 +73,13 @@ class MockMCPProxyAgent extends AbstractAgent {
       this as unknown as Internal
     ).runAgentResponses;
 
-    const registry = this;
+    const source = cloneBacking(this);
     Object.defineProperty(cloned, "isRunning", {
       get() {
-        return registry.isRunning;
+        return source.isRunning;
       },
       set(v: boolean) {
-        registry.isRunning = v;
+        source.isRunning = v;
       },
       configurable: true,
       enumerable: true,
@@ -90,7 +91,7 @@ class MockMCPProxyAgent extends AbstractAgent {
     ): Promise<RunAgentResult> {
       const proxiedRequest = input?.forwardedProps?.__proxiedMCPRequest;
       if (proxiedRequest) {
-        return registry.runAgent(input);
+        return source.runAgent(input);
       }
       return proto.runAgent.call(cloned, input);
     };
