@@ -297,8 +297,9 @@ describe("useHumanInTheLoop", () => {
         setup() {
           useHumanInTheLoop({
             name: "lifecycleTool",
+            description: "Lifecycle description",
             agentId,
-            parameters: z.object({}),
+            parameters: z.object({ value: z.string() }),
             render: RenderComp,
           });
           return () => null;
@@ -403,30 +404,98 @@ describe("useHumanInTheLoop", () => {
       const shared = { name: "lifecycleTool", toolCallId: "tc-props" };
       const inProgress = renderer.render({
         ...shared,
-        args: {},
+        args: { value: "partial" },
         status: "inProgress",
         result: undefined,
       }) as { props?: Record<string, unknown> };
       const executing = renderer.render({
         ...shared,
-        args: {},
+        args: { value: "complete-args" },
         status: "executing",
         result: undefined,
       }) as { props?: Record<string, unknown> };
       const complete = renderer.render({
         ...shared,
-        args: {},
+        args: { value: "complete-args" },
         status: "complete",
         result: "done",
       }) as { props?: Record<string, unknown> };
 
       for (const vnode of [inProgress, executing, complete]) {
+        expect(vnode.props?.name).toBe("lifecycleTool");
+        expect(vnode.props?.description).toBe("Lifecycle description");
         expect(vnode.props?.toolCallId).toBe("tc-props");
         expect(vnode.props?.agentId).toBe("research-agent");
       }
+      expect(inProgress.props?.args).toEqual({ value: "partial" });
+      expect(inProgress.props?.result).toBeUndefined();
+      expect(executing.props?.args).toEqual({ value: "complete-args" });
+      expect(executing.props?.result).toBeUndefined();
+      expect(complete.props?.args).toEqual({ value: "complete-args" });
+      expect(complete.props?.result).toBe("done");
       expect(inProgress.props?.respond).toBeUndefined();
       expect(typeof executing.props?.respond).toBe("function");
       expect(complete.props?.respond).toBeUndefined();
+    });
+
+    it("removes only the agent-scoped renderer on scope disposal", async () => {
+      const RenderComp = defineComponent({
+        setup() {
+          return () => h("div");
+        },
+      });
+      const createScopedChild = (agentId: string) =>
+        defineComponent({
+          setup() {
+            useHumanInTheLoop({
+              name: "sharedLifecycleTool",
+              agentId,
+              parameters: z.object({}),
+              render: RenderComp,
+            });
+            return () => null;
+          },
+        });
+      const ScopedA = createScopedChild("agent-a");
+      const ScopedB = createScopedChild("agent-b");
+      const Parent = defineComponent({
+        setup() {
+          const showA = ref(true);
+          return () =>
+            h("div", [
+              h("button", {
+                "data-testid": "dispose-agent-a",
+                onClick: () => (showA.value = false),
+              }),
+              showA.value ? h(ScopedA) : null,
+              h(ScopedB),
+            ]);
+        },
+      });
+
+      const { wrapper, getCore } = mountWithProvider(() => h(Parent));
+      await nextTick();
+      const renderers = () =>
+        getCore().renderToolCalls.filter(
+          (renderer) => renderer.name === "sharedLifecycleTool",
+        );
+      expect(renderers().map((renderer) => renderer.agentId)).toEqual([
+        "agent-a",
+        "agent-b",
+      ]);
+
+      await wrapper.find("[data-testid=dispose-agent-a]").trigger("click");
+      await nextTick();
+
+      expect(renderers().map((renderer) => renderer.agentId)).toEqual([
+        "agent-b",
+      ]);
+      expect(
+        getCore().getTool({
+          toolName: "sharedLifecycleTool",
+          agentId: "agent-b",
+        }),
+      ).toBeDefined();
     });
 
     it("leaves agentId undefined for an unscoped HITL tool", () => {
