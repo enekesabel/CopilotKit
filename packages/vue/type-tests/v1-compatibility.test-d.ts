@@ -1,5 +1,5 @@
 import { expectTypeOf, test } from "vitest";
-import type { Component, FunctionalComponent } from "vue";
+import { defineComponent, type PropType } from "vue";
 import {
   useCopilotAction,
   useCopilotReadable,
@@ -69,26 +69,53 @@ test("accepts correctly typed Vue component renderers", () => {
   ];
   type RenderProps = FrontendActionRenderProps<ActionParameters>;
   type WaitProps = FrontendActionWaitRenderProps<ActionParameters>;
+  const parameters: ActionParameters = [{ name: "city", type: "string" }];
 
-  const frontendComponent = null as unknown as Component<RenderProps>;
-  const hitlComponent = null as unknown as Component<WaitProps>;
+  const frontendComponent = defineComponent({
+    props: {
+      args: { type: Object as PropType<RenderProps["args"]>, required: true },
+      status: {
+        type: String as PropType<RenderProps["status"]>,
+        required: true,
+      },
+      result: { type: null as unknown as PropType<any> },
+    },
+    setup() {
+      return () => null;
+    },
+  });
+  const hitlComponent = defineComponent({
+    props: {
+      args: { type: Object as PropType<WaitProps["args"]>, required: true },
+      status: {
+        type: String as PropType<WaitProps["status"]>,
+        required: true,
+      },
+      result: { type: null as unknown as PropType<any> },
+      handler: { type: Function as PropType<(result: any) => void> },
+      respond: { type: Function as PropType<(result: any) => void> },
+    },
+    setup() {
+      return () => null;
+    },
+  });
 
   useCopilotAction({
     name: "component-action",
     available: "enabled",
-    parameters: [{ name: "city", type: "string" }],
+    parameters,
     render: frontendComponent,
   });
   useCopilotAction({
     name: "component-hitl",
-    parameters: [{ name: "city", type: "string" }],
+    parameters,
     renderAndWaitForResponse: hitlComponent,
   });
 });
 
 test("rejects Vue components with incompatible v1 props", () => {
   type WrongProps = { requiredByAnotherApi: boolean };
-  const wrongComponent = null as unknown as FunctionalComponent<WrongProps>;
+  const wrongComponent = defineComponent<WrongProps>(() => () => null);
 
   useCopilotAction({
     name: "wrong-frontend-component",
@@ -119,6 +146,12 @@ test("accepts the compatibility fields and rejects non-React v1 fields", () => {
 
   useCopilotAction({
     name: "agent-action",
+    handler: () => "done",
+    // @ts-expect-error agentId is not part of the React v1 contract.
+    agentId: "agent",
+  });
+  useFrontendTool({
+    name: "agent-tool",
     handler: () => "done",
     // @ts-expect-error agentId is not part of the React v1 contract.
     agentId: "agent",

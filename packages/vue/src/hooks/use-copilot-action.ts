@@ -65,14 +65,30 @@ export type FrontendActionWaitRenderProps<T extends Parameter[] | [] = []> =
       respond: undefined;
     });
 
+type FrontendActionComponentProps<T extends Parameter[] | []> = {
+  args: Partial<MappedParameterTypes<T>> | MappedParameterTypes<T>;
+  status: "inProgress" | "executing" | "complete";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- React v1 exposes `any` here.
+  result?: any;
+};
+
+type FrontendActionWaitComponentProps<T extends Parameter[] | []> =
+  FrontendActionComponentProps<T> & {
+    /** @deprecated use respond instead */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- React v1 exposes `any` here.
+    handler?: (result: any) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- React v1 exposes `any` here.
+    respond?: (result: any) => void;
+  };
+
 export type FrontendActionRender<T extends Parameter[] | [] = []> =
   | string
   | ((props: FrontendActionRenderProps<T>) => VNodeChild)
-  | Component<FrontendActionRenderProps<T>>;
+  | Component<FrontendActionComponentProps<T>>;
 
 export type FrontendActionWaitRender<T extends Parameter[] | [] = []> =
   | ((props: FrontendActionWaitRenderProps<T>) => VNodeChild)
-  | Component<FrontendActionWaitRenderProps<T>>;
+  | Component<FrontendActionWaitComponentProps<T>>;
 
 export type CatchAllFrontendActionRenderProps =
   | {

@@ -42,6 +42,9 @@ Keep it updated whenever React parity work lands in `packages/vue`.
 - The four legacy compatibility fields are accepted but runtime-non-consumed:
   action `disabled` and `pairedAction`, and readable `parentId` and
   `categories`. They are not registered, routed, or forwarded.
+- Function renderers retain React's discriminated union; Vue component
+  renderers use the equivalent flattened prop declaration because Vue props
+  are declared independently.
 - Readable keeps React's public two-parameter `convert(description, value)`
   type, while the pinned React runtime quirk invokes it with only `value`.
   Vue returns the adapted `Ref`, propagates conversion errors, and accepts but
