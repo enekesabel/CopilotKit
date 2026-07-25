@@ -15,6 +15,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        ScrollBehavior: "readonly",
       },
     },
   },
@@ -37,6 +38,18 @@ export default [
         sourceType: "module",
         extraFileExtensions: [".vue"],
       },
+    },
+  },
+  {
+    files: ["**/*.{ts,mts,cts,tsx}", "**/*.vue"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          ignoreRestSiblings: true,
+          argsIgnorePattern: "^_",
+        },
+      ],
     },
   },
 ];

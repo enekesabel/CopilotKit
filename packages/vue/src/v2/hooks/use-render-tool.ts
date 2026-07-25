@@ -51,6 +51,8 @@ type RenderToolConfig<S extends StandardSchemaV1> = {
 export function useRenderTool(
   config: {
     name: "*";
+    // Wildcard renderer props deferred (enekesabel/CopilotKit#5).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     render: ((props: any) => VNodeChild) | Component<any>;
     agentId?: string;
   },

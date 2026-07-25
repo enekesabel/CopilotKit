@@ -5,6 +5,7 @@ import type { AssistantMessage } from "@ag-ui/core";
 import CopilotKitProvider from "../../../providers/CopilotKitProvider.vue";
 import CopilotChatConfigurationProvider from "../../../providers/CopilotChatConfigurationProvider.vue";
 import CopilotChatAssistantMessage from "../CopilotChatAssistantMessage.vue";
+import { assistantMessageWithToolCall } from "../../../__tests__/utils/test-helpers";
 
 const TestWrapper = defineComponent({
   components: {
@@ -225,16 +226,12 @@ describe("CopilotChatAssistantMessage Slot System E2E Tests", () => {
 
     describe("toolCallsView slot", () => {
       it("should apply tailwind class string to toolCallsView", () => {
-        const message: AssistantMessage = {
-          ...createAssistantMessage("Hello"),
-          toolCalls: [
-            {
-              id: "tc-1",
-              type: "function",
-              function: { name: "test_tool", arguments: "{}" },
-            } as any,
-          ],
-        };
+        const base = createAssistantMessage("Hello");
+        const message = assistantMessageWithToolCall({
+          id: base.id,
+          toolCallId: "tc-1",
+          toolName: "test_tool",
+        });
         const Host = defineComponent({
           components: { CopilotChatAssistantMessage },
           setup() {

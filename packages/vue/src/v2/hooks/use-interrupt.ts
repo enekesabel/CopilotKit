@@ -396,6 +396,7 @@ export function useInterrupt<TValue = unknown, TResult = never>(
       }
 
       core.setInterruptState(
+        // Interrupt slot prop generics deferred (enekesabel/CopilotKit#5).
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         nextSlotProps as InterruptRenderProps<any, any> | null,
       );

@@ -85,7 +85,7 @@ const SnapshotRenderer = defineComponent({
 const LiveStateRenderer = defineComponent({
   name: "LiveStateRenderer",
   props: rendererProps,
-  setup(props) {
+  setup(_props) {
     const { agent } = useAgent();
     const currentStep = () => {
       const typedState = agent.value?.state as

@@ -9,7 +9,7 @@ import { computed, defineComponent, nextTick } from "vue";
 import type { PropType } from "vue";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
-import type { AssistantMessage, Message, ToolMessage } from "@ag-ui/core";
+import type { AssistantMessage, Message } from "@ag-ui/core";
 import { ToolCallStatus } from "@copilotkit/core";
 import { AbstractAgent, EventType } from "@ag-ui/client";
 import type { BaseEvent, RunAgentInput } from "@ag-ui/client";
@@ -21,6 +21,7 @@ import CopilotChatToolCallsView from "../CopilotChatToolCallsView.vue";
 import { useFrontendTool } from "../../../hooks/use-frontend-tool";
 import type { VueFrontendTool } from "../../../types";
 import type { VueToolCallRendererRenderProps } from "../../../types/vue-tool-call-renderer";
+import { toolMessage } from "../../../__tests__/utils/test-helpers";
 
 afterEach(() => {
   cleanup();
@@ -423,12 +424,13 @@ describe("Tool render status narrowing", () => {
 
     const messages: Message[] = [];
     if (withResult) {
-      messages.push({
-        id: "t1",
-        role: "tool",
-        toolCallId: "tc_status_1",
-        content: "Sunny",
-      } as ToolMessage as any);
+      messages.push(
+        toolMessage({
+          id: "t1",
+          toolCallId: "tc_status_1",
+          content: "Sunny",
+        }),
+      );
     }
 
     renderToolCallsHarness({

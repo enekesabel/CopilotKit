@@ -23,24 +23,27 @@ class MockMediaRecorder {
   public ondataavailable: ((event: BlobEvent) => void) | null = null;
   public onstop: (() => void) | null = null;
   public onerror: (() => void) | null = null;
-  private readonly listeners = new Map<string, Set<(...args: any[]) => void>>();
+  private readonly listeners = new Map<
+    string,
+    Set<(...args: unknown[]) => void>
+  >();
 
   constructor(_stream: MediaStream, _options?: MediaRecorderOptions) {
     void _stream;
     void _options;
   }
 
-  addEventListener(type: string, listener: (...args: any[]) => void) {
+  addEventListener(type: string, listener: (...args: unknown[]) => void) {
     const existing = this.listeners.get(type) ?? new Set();
     existing.add(listener);
     this.listeners.set(type, existing);
   }
 
-  removeEventListener(type: string, listener: (...args: any[]) => void) {
+  removeEventListener(type: string, listener: (...args: unknown[]) => void) {
     this.listeners.get(type)?.delete(listener);
   }
 
-  private dispatch(type: string, ...args: any[]) {
+  private dispatch(type: string, ...args: unknown[]) {
     for (const listener of this.listeners.get(type) ?? []) {
       listener(...args);
     }

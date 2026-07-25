@@ -3,7 +3,7 @@ import type { PropType } from "vue";
 import { screen, fireEvent, waitFor, cleanup } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
 import { z } from "zod";
-import type { AssistantMessage, Message } from "@ag-ui/core";
+import type { Message } from "@ag-ui/core";
 import { ToolCallStatus } from "@copilotkit/core";
 import { AbstractAgent, EventType } from "@ag-ui/client";
 import type {
@@ -19,6 +19,7 @@ import CopilotChat from "../../components/chat/CopilotChat.vue";
 import CopilotChatToolCallsView from "../../components/chat/CopilotChatToolCallsView.vue";
 import {
   MockStepwiseAgent,
+  assistantMessageWithToolCall,
   renderWithCopilotKit,
   runStartedEvent,
   runFinishedEvent,
@@ -27,6 +28,30 @@ import {
   textChunkEvent,
   testId,
 } from "../../__tests__/utils/test-helpers";
+
+function toolArgsProp<T extends Record<string, unknown>>() {
+  return { type: Object as PropType<T>, required: true as const };
+}
+
+const optionalUnknownResultProp = {
+  type: null as unknown as PropType<unknown>,
+  required: false as const,
+};
+
+const messageToolArgs = toolArgsProp<{ message: string }>();
+const actionToolArgs = toolArgsProp<{ action: string }>();
+const valueToolArgs = toolArgsProp<{ value: string }>();
+const textToolArgs = toolArgsProp<{ text: string }>();
+const streamingToolArgs = toolArgsProp<{
+  name: string;
+  items: string[];
+  count: number;
+}>();
+const integratedToolArgs = toolArgsProp<{ action: string; target: string }>();
+const childToolArgs = toolArgsProp<{ childValue: string }>();
+const parentToolArgs = toolArgsProp<{ parentValue: string }>();
+const testToolArgs = toolArgsProp<{ test: string }>();
+const wildcardToolArgs = toolArgsProp<Record<string, unknown>>();
 
 afterEach(() => {
   cleanup();
@@ -54,10 +79,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const DynamicToolRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: messageToolArgs,
         },
         template: `<div data-testid="dynamic-tool-render">{{ name }}: {{ args.message }}</div>`,
       });
@@ -76,21 +98,12 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       });
 
       const toolCallId = testId("tc_dyn");
-      const assistantMessage: AssistantMessage = {
+      const assistantMessage = assistantMessageWithToolCall({
         id: testId("a"),
-        role: "assistant",
-        content: "",
-        toolCalls: [
-          {
-            id: toolCallId,
-            type: "function",
-            function: {
-              name: "dynamicTool",
-              arguments: JSON.stringify({ message: "hello" }),
-            },
-          } as any,
-        ],
-      } as any;
+        toolCallId,
+        toolName: "dynamicTool",
+        toolArguments: { message: "hello" },
+      });
       const messages: Message[] = [];
 
       const ToolCallsHost = defineComponent({
@@ -134,11 +147,8 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const DynamicToolRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
-          result: { type: null as unknown as PropType<any>, required: false },
+          args: messageToolArgs,
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           const resultText = computed(() =>
@@ -252,10 +262,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const StreamingToolRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: streamingToolArgs,
         },
         setup(props) {
           const nameText = computed(() => props.args.name || "undefined");
@@ -401,10 +408,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const NoFollowUpRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: actionToolArgs,
           status: { type: String, required: true },
         },
         template: `
@@ -482,10 +486,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const ContinueRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: actionToolArgs,
         },
         template: `
           <div data-testid="continue-followup-tool">
@@ -686,11 +687,8 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const TemporaryToolRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
-          result: { type: null as unknown as PropType<any>, required: false },
+          args: valueToolArgs,
+          result: optionalUnknownResultProp,
           status: { type: String, required: true },
         },
         template: `<div data-testid="temporary-tool">{{ name }}: {{ args.value }} | Status: {{ status }} | Result: {{ String(result ?? "") }}</div>`,
@@ -770,10 +768,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const FirstRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: textToolArgs,
         },
         template: `<div data-testid="first-version">First Version: {{ args.text }} ({{ name }})</div>`,
       });
@@ -781,10 +776,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const SecondRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: textToolArgs,
         },
         template: `<div data-testid="second-version">Second Version (Override): {{ args.text }} ({{ name }})</div>`,
       });
@@ -915,11 +907,8 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const IntegratedRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
-          result: { type: null as unknown as PropType<any>, required: false },
+          args: integratedToolArgs,
+          result: optionalUnknownResultProp,
           status: { type: String, required: true },
         },
         setup(props) {
@@ -1026,18 +1015,15 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       const statusHistory: ToolCallStatus[] = [];
       let handlerStarted = false;
       let handlerCompleted = false;
-      let handlerResult: any = null;
+      let handlerResult: unknown = null;
 
       const agent = new MockStepwiseAgent();
 
       const ExecutingRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: valueToolArgs,
           status: { type: String as PropType<ToolCallStatus>, required: true },
-          result: { type: null as unknown as PropType<any>, required: false },
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           watch(
@@ -1178,20 +1164,14 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const WrongAgentRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: messageToolArgs,
         },
         template: `<div data-testid="wrong-agent-tool">Wrong Agent Tool: {{ args.message }}</div>`,
       });
       const DefaultAgentRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
-          result: { type: null as unknown as PropType<any>, required: false },
+          args: messageToolArgs,
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           const resultText = computed(() => JSON.stringify(props.result));
@@ -1206,10 +1186,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
       });
       const SpecificAgentRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: messageToolArgs,
         },
         template: `<div data-testid="specific-agent-tool">Specific Agent Tool: {{ args.message }}</div>`,
       });
@@ -1329,11 +1306,8 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const ScopedRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
-          result: { type: null as unknown as PropType<any>, required: false },
+          args: messageToolArgs,
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           const resultText = computed(() => JSON.stringify(props.result));
@@ -1349,11 +1323,8 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const GlobalRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
-          result: { type: null as unknown as PropType<any>, required: false },
+          args: messageToolArgs,
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           const resultText = computed(() => JSON.stringify(props.result));
@@ -1481,19 +1452,13 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const ChildRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: childToolArgs,
         },
         template: `<div data-testid="child-tool">Child: {{ args.childValue }}</div>`,
       });
       const ParentRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: parentToolArgs,
         },
         template: `<div data-testid="parent-tool">Parent: {{ args.parentValue }}</div>`,
       });
@@ -1597,10 +1562,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const AvailabilityRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: testToolArgs,
         },
         template: `<div data-testid="availability-tool">{{ args.test }}</div>`,
       });
@@ -1692,10 +1654,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const IdempotentRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: valueToolArgs,
         },
         setup(props) {
           renderCount += 1;
@@ -1799,10 +1758,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
           const DependencyRenderer = defineComponent({
             props: {
-              args: {
-                type: Object as PropType<Record<string, any>>,
-                required: true,
-              },
+              args: messageToolArgs,
             },
             setup(props) {
               const text = computed(
@@ -1822,21 +1778,12 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
           useFrontendTool(tool, [version]);
 
           const toolCallId = testId("dep_tc");
-          const assistantMessage: AssistantMessage = {
+          const assistantMessage = assistantMessageWithToolCall({
             id: testId("dep_a"),
-            role: "assistant",
-            content: "",
-            toolCalls: [
-              {
-                id: toolCallId,
-                type: "function",
-                function: {
-                  name: "dependencyTool",
-                  arguments: JSON.stringify({ message: "hello" }),
-                },
-              } as any,
-            ],
-          } as any;
+            toolCallId,
+            toolName: "dependencyTool",
+            toolArguments: { message: "hello" },
+          });
           const messages: Message[] = [];
 
           const bumpVersion = () => {
@@ -1881,12 +1828,9 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const ErrorRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: messageToolArgs,
           status: { type: String, required: true },
-          result: { type: null as unknown as PropType<any>, required: false },
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           const resultText = computed(() =>
@@ -1994,12 +1938,9 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const AsyncErrorRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: messageToolArgs,
           status: { type: String, required: true },
-          result: { type: null as unknown as PropType<any>, required: false },
+          result: optionalUnknownResultProp,
         },
         template: `
           <div data-testid="async-error-tool">
@@ -2080,17 +2021,14 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
   describe("Wildcard Handler", () => {
     it("should handle unknown tools with wildcard", async () => {
       const agent = new MockStepwiseAgent();
-      const wildcardHandlerCalls: { name: string; args: any }[] = [];
+      const wildcardHandlerCalls: { name: string; args: unknown }[] = [];
 
       const WildcardRenderer = defineComponent({
         props: {
           name: { type: String, required: true },
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: wildcardToolArgs,
           status: { type: String, required: true },
-          result: { type: null as unknown as PropType<any>, required: false },
+          result: optionalUnknownResultProp,
         },
         setup(props) {
           const rootTestId = computed(() => `wildcard-render-${props.name}`);
@@ -2113,11 +2051,11 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const WildcardTool = defineComponent({
         setup() {
-          const tool: VueFrontendTool<any> = {
+          const tool: VueFrontendTool<unknown> = {
             name: "*",
             parameters: z.any(),
             render: WildcardRenderer,
-            handler: async (args: any) => {
+            handler: async (args: unknown) => {
               wildcardHandlerCalls.push({ name: "wildcard", args });
               return { handled: "by wildcard", receivedArgs: args };
             },
@@ -2216,10 +2154,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const SpecificRenderer = defineComponent({
         props: {
-          args: {
-            type: Object as PropType<Record<string, any>>,
-            required: true,
-          },
+          args: valueToolArgs,
         },
         template: `<div data-testid="specific-render">Specific: {{ args.value }}</div>`,
       });
@@ -2243,7 +2178,7 @@ describe("useFrontendTool E2E - Dynamic Registration", () => {
 
       const WildcardTool = defineComponent({
         setup() {
-          const tool: VueFrontendTool<any> = {
+          const tool: VueFrontendTool<unknown> = {
             name: "*",
             parameters: z.any(),
             render: WildcardRenderer,

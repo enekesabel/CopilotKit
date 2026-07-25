@@ -25,6 +25,8 @@ export function defineToolCallRenderer<S extends StandardSchemaV1>(def: {
   const argsSchema = def.name === "*" && !def.args ? z.any() : def.args;
   return {
     name: def.name,
+    // Schema input typing deferred (enekesabel/CopilotKit#5).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     args: argsSchema as StandardSchemaV1<any, unknown>,
     render: def.render as VueToolCallRenderer<unknown>["render"],
     ...(def.agentId ? { agentId: def.agentId } : {}),

@@ -6,7 +6,9 @@ import { useFrontendTool } from "./use-frontend-tool";
 
 type InferRenderProps<T> = T extends StandardSchemaV1
   ? InferSchemaOutput<T>
-  : any;
+  : // No-schema fallback render props deferred (enekesabel/CopilotKit#5).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any;
 
 export function useComponent<
   TSchema extends StandardSchemaV1 | undefined = undefined,
@@ -30,8 +32,9 @@ export function useComponent<
       name: config.name,
       description: fullDescription,
       parameters: config.parameters as
-        | StandardSchemaV1<any, Record<string, unknown>>
-        | undefined,
+        // Schema input typing deferred (enekesabel/CopilotKit#5).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        StandardSchemaV1<any, Record<string, unknown>> | undefined,
       render: ({ args }: { args: unknown }) => {
         const RenderComponent = config.render;
         return h(

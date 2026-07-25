@@ -56,6 +56,8 @@ describe("CopilotChat", () => {
           copilotkit: CopilotKitCoreVue;
           error: Error;
           code: CopilotKitCoreErrorCode;
+          // Test mirrors opaque onError.context typing (enekesabel/CopilotKit#7).
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           context: Record<string, any>;
         }) => void | Promise<void>;
       }) => void | Promise<void>,

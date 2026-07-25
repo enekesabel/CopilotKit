@@ -2,7 +2,6 @@ import { cleanup, fireEvent, screen, waitFor } from "@testing-library/vue";
 import { computed, defineComponent, onMounted } from "vue";
 import type { PropType } from "vue";
 import { afterEach, describe, expect, it } from "vitest";
-import { EventType } from "@ag-ui/client";
 import { z } from "zod";
 import { useConfigureSuggestions } from "../../../hooks/use-configure-suggestions";
 import {
@@ -15,6 +14,7 @@ import {
   reasoningMessageStartEvent,
   reasoningStartEvent,
   renderWithCopilotKit,
+  runErrorEvent,
   runFinishedEvent,
   runStartedEvent,
   testId,
@@ -166,7 +166,7 @@ describe("CopilotChat E2E - Chat Basics and Streaming Patterns", () => {
         );
       });
 
-      await agent.emit({ type: EventType.RUN_ERROR } as any);
+      await agent.emit(runErrorEvent());
       await agent.complete();
 
       await waitFor(() => {

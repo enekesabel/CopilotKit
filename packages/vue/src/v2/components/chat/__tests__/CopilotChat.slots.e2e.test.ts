@@ -5,13 +5,17 @@ import CopilotChat from "../CopilotChat.vue";
 import { renderWithCopilotKit } from "../../../__tests__/utils/mount";
 import { StateCapturingAgent } from "../../../__tests__/utils/agents";
 import { getThreadClone } from "../../../hooks/use-agent";
+import type {
+  CopilotChatMessageViewSlotProps,
+  CopilotChatViewOverrideSlotProps,
+} from "../types";
 
 describe("CopilotChat.slots.e2e", () => {
   it("supports full chat-view override with callback payload", async () => {
     const agent = new StateCapturingAgent([], "default");
     const onSubmitSpy = vi.fn();
 
-    const { wrapper, getCore } = renderWithCopilotKit(
+    const { wrapper } = renderWithCopilotKit(
       () =>
         h(
           CopilotChat,
@@ -20,7 +24,11 @@ describe("CopilotChat.slots.e2e", () => {
             onSubmitMessage: onSubmitSpy,
           },
           {
-            "chat-view": ({ messages, isRunning, onSubmitMessage }: any) =>
+            "chat-view": ({
+              messages,
+              isRunning,
+              onSubmitMessage,
+            }: CopilotChatViewOverrideSlotProps) =>
               h("div", { "data-testid": "custom-chat-view" }, [
                 h("span", { "data-testid": "slot-running" }, String(isRunning)),
                 h(
@@ -64,7 +72,7 @@ describe("CopilotChat.slots.e2e", () => {
             welcomeScreen: false,
           },
           {
-            "message-view": ({ messages }: any) =>
+            "message-view": ({ messages }: CopilotChatMessageViewSlotProps) =>
               h(
                 "div",
                 { "data-testid": "custom-message-view" },

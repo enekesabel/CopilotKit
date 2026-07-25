@@ -162,7 +162,7 @@ export function useConfigureSuggestions(
 
   watch(
     [() => copilotkit.value, serializedConfig],
-    ([_core, serialized], _old, onCleanup) => {
+    ([, serialized], _old, onCleanup) => {
       if (!serialized || !normalizedConfig.value) {
         return;
       }

@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { defineComponent, nextTick } from "vue";
 import {
   activitySnapshotEvent,
+  cloneBacking,
   runFinishedEvent,
   runStartedEvent,
   testId,
@@ -79,13 +80,13 @@ class MockMCPProxyAgent extends AbstractAgent {
       this as unknown as Internal
     ).runAgentResponses;
 
-    const registry = this;
+    const source = cloneBacking(this);
     Object.defineProperty(cloned, "isRunning", {
       get() {
-        return registry.isRunning;
+        return source.isRunning;
       },
       set(v: boolean) {
-        registry.isRunning = v;
+        source.isRunning = v;
       },
       configurable: true,
       enumerable: true,
@@ -97,20 +98,20 @@ class MockMCPProxyAgent extends AbstractAgent {
     ): Promise<RunAgentResult> {
       const proxiedRequest = input?.forwardedProps?.__proxiedMCPRequest;
       if (proxiedRequest) {
-        return registry.runAgent(input);
+        return source.runAgent(input);
       }
       return proto.runAgent.call(cloned, input);
     };
 
     cloned.run = function (input: RunAgentInput): Observable<BaseEvent> {
-      return registry.run(input);
+      return source.run(input);
     };
 
     const originalAddMessage = cloned.addMessage.bind(cloned);
     cloned.addMessage = function (
       message: Parameters<AbstractAgent["addMessage"]>[0],
     ) {
-      registry.addMessageCalls.push({
+      source.addMessageCalls.push({
         id: message.id,
         role: message.role,
         content: message.content,

@@ -2,6 +2,7 @@ import { defineComponent, reactive, ref } from "vue";
 import { fireEvent, screen, waitFor, cleanup } from "@testing-library/vue";
 import { describe, it, expect, afterEach } from "vitest";
 import { DEFAULT_AGENT_ID } from "@copilotkit/shared";
+import type { Suggestion } from "@copilotkit/core";
 import type { AbstractAgent } from "@ag-ui/client";
 import { useConfigureSuggestions } from "../use-configure-suggestions";
 import { useSuggestions } from "../use-suggestions";
@@ -11,6 +12,7 @@ import {
   MockStepwiseAgent,
   runStartedEvent,
   runFinishedEvent,
+  userMessage,
 } from "../../__tests__/utils/test-helpers";
 import {
   SuggestionsProviderAgent,
@@ -22,10 +24,15 @@ afterEach(() => {
 });
 
 class ImmediateSuggestionsProviderAgent extends SuggestionsProviderAgent {
-  constructor(responses: any[]) {
+  constructor(responses: Suggestion[]) {
     super(responses, DEFAULT_AGENT_ID);
   }
 }
+
+type MutableStaticSuggestionsConfig = {
+  suggestions: Array<Pick<Suggestion, "title" | "message">>;
+  consumerAgentId?: string | "*";
+};
 
 describe("useConfigureSuggestions", () => {
   it("registers suggestions config and surfaces generated suggestions", async () => {
@@ -70,7 +77,7 @@ describe("global suggestions coverage", () => {
   it("applies updates across all agents when consumerAgentId is undefined", async () => {
     const alpha = new StateCapturingAgent([{ newMessages: [] }], "alpha");
     const beta = new StateCapturingAgent([{ newMessages: [] }], "beta");
-    const config = reactive<any>({
+    const config = reactive<MutableStaticSuggestionsConfig>({
       suggestions: [{ title: "Global v1", message: "Global v1" }],
       consumerAgentId: undefined,
     });
@@ -125,7 +132,7 @@ describe("global suggestions coverage", () => {
   it("applies updates across all agents when consumerAgentId is '*'", async () => {
     const alpha = new StateCapturingAgent([{ newMessages: [] }], "alpha");
     const beta = new StateCapturingAgent([{ newMessages: [] }], "beta");
-    const config = reactive<any>({
+    const config = reactive<MutableStaticSuggestionsConfig>({
       suggestions: [{ title: "Global v1", message: "Global v1" }],
       consumerAgentId: "*",
     });
@@ -242,11 +249,12 @@ describe("static suggestions defaults", () => {
 
         const addMessage = () => {
           const current = copilotkit.value.getAgent(DEFAULT_AGENT_ID);
-          current?.addMessage({
-            id: "u1",
-            role: "user",
-            content: "User message",
-          } as any);
+          current?.addMessage(
+            userMessage({
+              id: "u1",
+              content: "User message",
+            }),
+          );
           reloadSuggestions();
         };
 
@@ -294,11 +302,12 @@ describe("suggestions lifecycle during runs", () => {
         const runAgent = () => {
           const current = copilotkit.value.getAgent(DEFAULT_AGENT_ID);
           if (current) {
-            current.addMessage({
-              id: "u-run",
-              role: "user",
-              content: "Initiating run",
-            } as any);
+            current.addMessage(
+              userMessage({
+                id: "u-run",
+                content: "Initiating run",
+              }),
+            );
             void copilotkit.value.runAgent({ agent: current });
           }
         };

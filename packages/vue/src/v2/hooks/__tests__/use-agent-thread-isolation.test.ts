@@ -1,7 +1,8 @@
 import { defineComponent, nextTick, ref, toRaw, watchEffect } from "vue";
 import { render, cleanup } from "@testing-library/vue";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { AbstractAgent, type BaseEvent } from "@ag-ui/client";
+import { AbstractAgent } from "@ag-ui/client";
+import type { BaseEvent } from "@ag-ui/client";
 import { CopilotKitCoreRuntimeConnectionStatus } from "@copilotkit/core";
 import { Observable } from "rxjs";
 import { useCopilotKit } from "../../providers/useCopilotKit";
@@ -72,7 +73,7 @@ describe("useAgent thread isolation", () => {
     const agents: Record<string, AbstractAgent> = {};
 
     const TrackerA = defineComponent({
-      setup(props) {
+      setup(_props) {
         const { agent } = useAgent({
           agentId: "my-agent",
           threadId: "thread-a",
@@ -86,7 +87,7 @@ describe("useAgent thread isolation", () => {
     });
 
     const TrackerB = defineComponent({
-      setup(props) {
+      setup(_props) {
         const { agent } = useAgent({
           agentId: "my-agent",
           threadId: "thread-b",
