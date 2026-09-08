@@ -42,7 +42,10 @@ import {
 } from "@/lib/angular-doc-navigation";
 import { buildFrontendBackendOverview } from "@/lib/secondary-frontend-backend-overview";
 import { docsComponents } from "@/lib/mdx-registry";
-import { resolveFrontendDocPage } from "@/lib/frontend-doc-policy";
+import {
+  hasFrontendVariant,
+  resolveFrontendDocPage,
+} from "@/lib/frontend-doc-policy";
 import {
   getFrontendGuidanceContentSlug,
   getFrontendContentSlug,
@@ -844,7 +847,14 @@ export default async function FrameworkScopedDocsPage({
   //               to the agnostic page, e.g. enterprise CTAs).
   //   generated — root MDX wins (Model 1, current behavior); the
   //               per-framework tree is a sparse override layer.
-  if (docsMode === "authored") {
+  if (activeFrontendPage === "vue" && hasFrontendVariant("vue", slugPath)) {
+    // Keep Vue examples when selecting a backend; backend context still drives
+    // demos and links below. Backend-only topics retain their normal resolution.
+    const resolution = resolveFrontendDocPage("vue", slugPath);
+    if (resolution.status !== "found") notFound();
+    contentSlugPath = resolution.contentSlugPath;
+    doc = loadDoc(contentSlugPath);
+  } else if (docsMode === "authored") {
     const frameworkPath = `integrations/${docsFolder}/${slugPath}`;
     doc = loadDoc(frameworkPath);
     if (doc) contentSlugPath = frameworkPath;

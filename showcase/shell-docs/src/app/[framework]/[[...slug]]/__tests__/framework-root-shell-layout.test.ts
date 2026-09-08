@@ -59,6 +59,17 @@ test("renders backend docs for every frontend route with a backend slug", () => 
   );
 });
 
+test("prefers Vue variants before backend-authored content", () => {
+  const resolution = sourceBetween(
+    'if (activeFrontendPage === "vue" && hasFrontendVariant("vue", slugPath))',
+    "// Authored integrations own their full docs tree",
+  );
+  expect(resolution).toContain('resolveFrontendDocPage("vue", slugPath)');
+  expect(
+    resolution.indexOf("contentSlugPath = resolution.contentSlugPath"),
+  ).toBeLessThan(resolution.indexOf('else if (docsMode === "authored")'));
+});
+
 test("keeps frontend root pages available under frontend/backend routes", () => {
   const frontendRootIndex = pageSource.indexOf(
     "if (!activeFrontendSlugPath) {",
