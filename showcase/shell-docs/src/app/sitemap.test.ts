@@ -110,7 +110,7 @@ test("publishes the Vue routes derived from the root documentation IA", () => {
     expect.arrayContaining([
       "/vue",
       "/vue/using-these-docs",
-      "/vue/prebuilt-components/chat",
+      "/vue/prebuilt-components",
       "/vue/threads",
       "/vue/threads-import",
       "/vue/generative-ui/tool-rendering",

@@ -64,7 +64,7 @@ test("publishes Vue routes from the derived frontend navigation", async () => {
   for (const url of [
     "vue",
     "vue/using-these-docs",
-    "vue/prebuilt-components/chat",
+    "vue/prebuilt-components",
     "vue/threads",
     "vue/threads-import",
     "vue/generative-ui/tool-rendering",

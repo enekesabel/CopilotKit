@@ -40,7 +40,7 @@ For multi-user applications, configure the runtime to [scope Rich Threads to the
   <Step>
     ### Configure your Runtime with CopilotKit Intelligence
 
-    Your `CopilotRuntime` must be connected to CopilotKit Intelligence before the thread UI can list and resume conversations. CLI-created starters generate this setup; otherwise follow [Connect your runtime to Intelligence](/premium/connect-your-runtime).
+    Your `CopilotRuntime` must be connected to CopilotKit Intelligence before the thread UI can list and resume conversations. CLI-created starters generate this setup; otherwise follow [Connect your runtime to Intelligence](/intelligence/connect-your-runtime).
 
     ```typescript title="server.ts"
     import {
@@ -51,7 +51,7 @@ For multi-user applications, configure the runtime to [scope Rich Threads to the
     const runtime = new CopilotRuntime({
       agents: { default: agent },
       intelligence: new CopilotKitIntelligence({
-        apiKey: process.env.INTELLIGENCE_API_KEY!,
+        apiKey: process.env.CPK_INTELLIGENCE_API_KEY!,
       }),
       identifyUser: async (request) => {
         const session = await verifyAppSession(request);
@@ -65,7 +65,7 @@ For multi-user applications, configure the runtime to [scope Rich Threads to the
     });
     ```
 
-    Keep the project-scoped `INTELLIGENCE_API_KEY` on the server. Existing Intelligence-enabled apps should retain their current runtime configuration.
+    Keep the project-scoped `CPK_INTELLIGENCE_API_KEY` on the server. Existing Intelligence-enabled apps should retain their current runtime configuration.
 
     | Option | Default | Max | Description |
     | --- | --- | --- | --- |
@@ -187,6 +187,6 @@ For multi-user applications, configure the runtime to [scope Rich Threads to the
 ## Next steps
 
 - **Prebuilt UI:** [Threads Drawer](/vue/prebuilt-components/copilot-threads-drawer) — the drop-in Vue thread switcher.
-- **Thread architecture:** [Threads & Persistence Architecture](/premium/threads-explained) — event replay and realtime sync.
-- **Production self-hosting:** [Self-host CopilotKit Intelligence](/premium/self-hosting).
+- **Thread architecture:** [Threads & Persistence Architecture](/intelligence/threads-explained) — event replay and realtime sync.
+- **Production self-hosting:** [Self-host CopilotKit Intelligence](/intelligence/self-hosting).
 - **API reference:** [`useThreads`](/reference/vue/hooks/useThreads) — parameters, return values, and types.

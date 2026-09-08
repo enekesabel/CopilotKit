@@ -2,7 +2,8 @@ import { FRONTEND_OPTIONS, isChannelFrontend } from "./frontend-options";
 import type { FrontendId } from "./frontend-options";
 import { CHANNEL_GUIDE_ROUTES } from "./channel-guide-routes";
 import type { ChannelGuideSection } from "./channel-guide-routes";
-import { buildNavTree, CONTENT_DIR } from "./docs-render";
+import { buildRootSurfaceNav } from "./docs-render";
+import { getDocsFolder, ROOT_FRAMEWORK } from "./registry";
 import type { NavNode } from "./docs-render";
 import { resolveFrontendDocPage } from "./frontend-doc-policy";
 import { referenceVersionHref } from "./reference-items";
@@ -337,7 +338,12 @@ function filterVueNavNodes(nodes: NavNode[]): NavNode[] {
     ) {
       continue;
     }
-    filtered.push(node);
+    filtered.push({
+      ...node,
+      slug: node.slug.endsWith("/index")
+        ? node.slug.slice(0, -"/index".length)
+        : node.slug,
+    });
     sectionHasPages = true;
   }
 
@@ -354,9 +360,8 @@ function filterVueNavNodes(nodes: NavNode[]): NavNode[] {
  * root tree as the single navigation source while preserving Vue variants.
  */
 export function buildVueDocsNavTree(): NavNode[] {
-  const rootNav = filterVueNavNodes(buildNavTree(CONTENT_DIR));
-  const getStartedIndex = rootNav.findIndex(
-    (node) => node.type === "section" && node.title === "Get Started",
+  const rootNav = filterVueNavNodes(
+    buildRootSurfaceNav(getDocsFolder(ROOT_FRAMEWORK)),
   );
   const vueGettingStarted: NavNode[] = [
     { type: "page", title: "Quickstart", slug: "" },
@@ -367,24 +372,9 @@ export function buildVueDocsNavTree(): NavNode[] {
     },
   ];
 
-  if (getStartedIndex === -1) {
-    return [
-      { type: "section", title: "Get Started", icon: "lucide/Rocket" },
-      ...vueGettingStarted,
-      ...rootNav,
-      {
-        type: "page",
-        title: "Reference docs",
-        slug: "reference/vue",
-        href: referenceVersionHref("vue"),
-      },
-    ];
-  }
-
   return [
-    ...rootNav.slice(0, getStartedIndex + 1),
     ...vueGettingStarted,
-    ...rootNav.slice(getStartedIndex + 1),
+    ...rootNav,
     {
       type: "page",
       title: "Reference docs",

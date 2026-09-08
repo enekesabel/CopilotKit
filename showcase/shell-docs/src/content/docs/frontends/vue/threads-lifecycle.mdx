@@ -93,7 +93,7 @@ import { CopilotKitIntelligence, CopilotRuntime } from "@copilotkit/runtime/v2";
 const runtime = new CopilotRuntime({
   agents: { default: agent },
   intelligence: new CopilotKitIntelligence({
-    apiKey: process.env.INTELLIGENCE_API_KEY!,
+    apiKey: process.env.CPK_INTELLIGENCE_API_KEY!,
   }),
   identifyUser: async (request) => {
     const session = await verifyAppSession(request);
@@ -109,7 +109,7 @@ CopilotKit Intelligence combines that application user identity with the project
   A static `identifyUser` value is suitable only for a single-user demo. In a multi-user application, every request must resolve the authenticated application user or those users will share a thread scope.
 </Callout>
 
-See [Authentication](/auth) for forwarding and verifying auth context, and [Connect your runtime to Intelligence](/premium/connect-your-runtime) for the full Intelligence configuration.
+See [Authentication](/auth) for forwarding and verifying auth context, and [Connect your runtime to Intelligence](/intelligence/connect-your-runtime) for the full Intelligence configuration.
 
 ## Switching threads and starting new ones
 
@@ -201,6 +201,6 @@ If the server-side store replays the thread's tool-call and activity history, th
 ## See also
 
 - [Headless Threads](/vue/headless-threads) — the full Vue `useThreads` API.
-- [Threads & Persistence Architecture](/premium/threads-explained) — server-side replay, resume, and realtime sync.
+- [Threads & Persistence Architecture](/intelligence/threads-explained) — server-side replay, resume, and realtime sync.
 - [Multi-conversation chat](/tutorials/multi-conversation-chat) — build a history sidebar.
 - [Importing and synchronizing thread history](/threads-import) — bring existing framework conversations into the platform.

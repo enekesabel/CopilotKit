@@ -30,11 +30,13 @@ import {
 } from "../frontend-page-content";
 import {
   buildBreadcrumbs,
+  buildRootSurfaceNav,
   loadDoc,
   navSectionTitleForSlug,
   visibleGuideBreadcrumbs,
 } from "../docs-render";
 import type { NavNode } from "../docs-render";
+import { getDocsFolder, ROOT_FRAMEWORK } from "../registry";
 import { resolveFrontendDocPage } from "../frontend-doc-policy";
 import { resolveDocsHref } from "../docs-link-rewrite";
 import {
@@ -798,17 +800,26 @@ test("derives the Vue sidebar from root IA and frontend resolution", () => {
 
   expect(
     navTree.filter(
-      (node) => node.type === "section" && node.title === "Get Started",
+      (node) => node.type === "section" && node.title === "Getting Started",
     ),
-  ).toHaveLength(1);
+  ).toHaveLength(0);
   expect(pageUrls.filter((url) => url === "/vue")).toHaveLength(1);
+  const rootSections = buildRootSurfaceNav(getDocsFolder(ROOT_FRAMEWORK))
+    .filter((node) => node.type === "section")
+    .map((node) => node.title);
+  const vueSections = navTree
+    .filter((node) => node.type === "section")
+    .map((node) => node.title);
+  expect(vueSections).toEqual(
+    rootSections.filter((title) => vueSections.includes(title)),
+  );
 
   expect(pageUrls).toEqual(
     expect.arrayContaining([
       "/vue",
       "/vue/using-these-docs",
       "/vue/concepts/which-hook",
-      "/vue/prebuilt-components/chat",
+      "/vue/prebuilt-components",
       "/vue/threads",
       "/vue/threads-import",
       "/vue/prebuilt-components/copilot-threads-drawer",

@@ -8,7 +8,7 @@ doc_type: explanation
 
 A common question is: _how do I point CopilotKit's threads at my own database instead of CopilotKit Intelligence?_
 
-The honest answer is that you cannot, because there is no such extension point. CopilotKit does not define a bring-your-own thread backend endpoint spec. [Rich Threads](/threads) — `useThreads`, the [Threads Drawer](/vue/prebuilt-components/copilot-threads-drawer), cross-device sync, and replayable event history — are a capability of [CopilotKit Intelligence](/premium/overview), not an interface with a swappable implementation.
+The honest answer is that you cannot, because there is no such extension point. CopilotKit does not define a bring-your-own thread backend endpoint spec. [Rich Threads](/threads) — `useThreads`, the [Threads Drawer](/vue/prebuilt-components/copilot-threads-drawer), cross-device sync, and replayable event history — are a capability of [CopilotKit Intelligence](/intelligence/overview), not an interface with a swappable implementation.
 
 What you *can* do without the platform is persist conversations yourself. That path works, but it looks different from Rich Threads, and the tradeoffs matter.
 
