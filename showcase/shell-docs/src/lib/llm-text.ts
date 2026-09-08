@@ -362,8 +362,8 @@ export function getAllLlmPages(
     }
   }
 
-  // 4. Vue docs follow the root IA through frontend resolution. The derived
-  // navigation tree remains the single source for both sidebar and LLM URLs.
+  // 4. Include shared Vue routes and authored guides, including pages omitted
+  // from the sidebar, just as the root React documentation walk does.
   const vueQuickstart = loadDoc("frontends/vue");
   if (vueQuickstart) {
     push({

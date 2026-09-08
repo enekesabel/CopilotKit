@@ -1,8 +1,10 @@
+import fs from "node:fs";
+import path from "node:path";
 import { FRONTEND_OPTIONS, isChannelFrontend } from "./frontend-options";
 import type { FrontendId } from "./frontend-options";
 import { CHANNEL_GUIDE_ROUTES } from "./channel-guide-routes";
 import type { ChannelGuideSection } from "./channel-guide-routes";
-import { buildRootSurfaceNav } from "./docs-render";
+import { buildRootSurfaceNav, CONTENT_DIR } from "./docs-render";
 import { getDocsFolder, ROOT_FRAMEWORK } from "./registry";
 import type { NavNode } from "./docs-render";
 import { resolveFrontendDocPage } from "./frontend-doc-policy";
@@ -384,12 +386,28 @@ export function buildVueDocsNavTree(): NavNode[] {
   ];
 }
 
-/** Canonical Vue route slugs derived from the Vue sidebar tree. */
+/** Shared sidebar pages plus authored Vue guides, including unlisted pages. */
 export function getVueDocsPageRoutes(): Array<{
   slugPath: string;
   canonicalSlugPath: string;
 }> {
-  return collectVueDocsPageRoutes(buildVueDocsNavTree());
+  const routes = collectVueDocsPageRoutes(buildVueDocsNavTree());
+  const vueDir = path.join(CONTENT_DIR, "frontends", "vue");
+  for (const file of fs.readdirSync(vueDir, {
+    recursive: true,
+    encoding: "utf8",
+  })) {
+    if (!file.endsWith(".mdx")) continue;
+    const slugPath = file.replaceAll(path.sep, "/").replace(/\.mdx$/, "");
+    const canonicalSlugPath = slugPath.replace(/(^|\/)index$/, "");
+    if (resolveFrontendDocPage("vue", slugPath).status !== "found") continue;
+    routes.push({ slugPath, canonicalSlugPath });
+  }
+  return [
+    ...new Map(
+      routes.map((route) => [route.canonicalSlugPath, route]),
+    ).values(),
+  ];
 }
 
 function collectVueDocsPageRoutes(

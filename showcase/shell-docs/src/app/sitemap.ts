@@ -183,8 +183,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Vue derives its discoverable routes from the root navigation tree, so
-  // sitemap coverage follows the same frontend-resolution policy as its UI.
+  // Include authored Vue pages even when the current sidebar omits them,
+  // matching the root React documentation's discovery behavior.
   for (const { slugPath, canonicalSlugPath } of getVueDocsPageRoutes()) {
     if (!slugPath) continue;
     const resolution = resolveFrontendDocPage("vue", slugPath);

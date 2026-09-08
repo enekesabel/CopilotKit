@@ -116,6 +116,15 @@ test("publishes the Vue routes derived from the root documentation IA", () => {
       "/vue/generative-ui/tool-rendering",
       "/vue/human-in-the-loop",
       "/vue/inspector",
+      "/vue/custom-look-and-feel/css",
+      "/vue/custom-look-and-feel/reasoning-messages",
+      "/vue/generative-ui/reasoning",
+      "/vue/multimodal-attachments",
+      "/vue/prebuilt-components/chat",
+      "/vue/prebuilt-components/chat-controls",
+      "/vue/prebuilt-components/popup",
+      "/vue/prebuilt-components/sidebar",
+      "/vue/voice",
     ]),
   );
   expect(paths).not.toEqual(
