@@ -9,34 +9,30 @@ capturing thumbs-up or thumbs-down feedback on assistant messages.
 
 ## Programmatically open or close chat
 
-`CopilotPopup` and `CopilotSidebar` create modal state for their rendered
-descendants. Call `useCopilotChatConfiguration()` from a component below the
-surface's configuration provider, then use the reactive `isModalOpen` value
-and optional `setModalOpen` action:
+Use the `toggle-button` scoped slot on `CopilotPopup` or `CopilotSidebar` to
+replace the launcher with your own UI. The slot receives the current open state
+and `toggle`, `open`, and `close` actions:
 
-```vue title="ChatControls.vue"
+```vue title="App.vue"
 <script setup lang="ts">
-import { useCopilotChatConfiguration } from "@copilotkit/vue/v2";
-
-const configuration = useCopilotChatConfiguration();
-
-function toggleChat() {
-  const value = configuration.value;
-  value?.setModalOpen?.(!value.isModalOpen);
-}
+import { CopilotPopup } from "@copilotkit/vue/v2";
 </script>
 
 <template>
-  <button v-if="configuration?.setModalOpen" type="button" @click="toggleChat">
-    {{ configuration.isModalOpen ? "Close chat" : "Ask the assistant" }}
-  </button>
+  <CopilotPopup agent-id="my-agent">
+    <template #toggle-button="{ isOpen, toggle }">
+      <button type="button" @click="toggle">
+        {{ isOpen ? "Close chat" : "Ask the assistant" }}
+      </button>
+    </template>
+  </CopilotPopup>
 </template>
 ```
 
-The composable must run in a descendant component below the provider that owns
-the modal state. If no provider owns it, `isModalOpen` and `setModalOpen` are
-undefined. Set the initial state declaratively with `:default-open="true"` on
-`CopilotPopup` or `CopilotSidebar`.
+Set the initial state declaratively with `:default-open="true"` on
+`CopilotPopup` or `CopilotSidebar`. These Vue components do not expose a
+controlled `open` / `onOpenChange`-style API; use the scoped-slot actions to
+control the surface after it mounts.
 
 ## Capture message feedback
 

@@ -62,6 +62,17 @@ The runtime runs on your server, keeps model credentials out of the browser, and
 
         Add a small Node server that hosts Copilot Runtime at `/api/copilotkit` and registers a `default` built-in agent:
 
+        <Callout type="warn" title="Already have an agent? Do not use BuiltInAgent">
+          `BuiltInAgent` is CopilotKit's own agent — it calls the model directly.
+          Registering it as `default` means chat talks to it, not to an agent you
+          already wrote. It replaces your agent rather than connecting to it.
+
+          If you already have a LangGraph, CrewAI, Mastra, ADK, Pydantic AI, or
+          other agent, use your framework's quickstart for the runtime wiring so
+          it registers your agent instead. You can still use the Vue frontend
+          steps on this page.
+        </Callout>
+
         ```ts title="server.ts"
         import { createServer } from "node:http";
         import { BuiltInAgent, CopilotRuntime } from "@copilotkit/runtime/v2";
